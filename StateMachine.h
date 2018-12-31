@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "DataTypes.h"
-#include "sm_allocator.h"
+#include "Fault.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,7 +11,8 @@ extern "C" {
 
 // Define USE_SM_ALLOCATOR to use the fixed block allocator instead of heap
 #define USE_SM_ALLOCATOR
-    #ifdef USE_SM_ALLOCATOR
+#ifdef USE_SM_ALLOCATOR
+    #include "sm_allocator.h"
     #define SM_XALLOC(size)    SMALLOC_Alloc(size)
     #define SM_XFREE(ptr)      SMALLOC_Free(ptr)
 #else
@@ -19,8 +20,6 @@ extern "C" {
     #define SM_XALLOC(size)    malloc(size)
     #define SM_XFREE(ptr)      free(ptr)
 #endif
-
-typedef void* SM_HANDLE;
 
 #define EVENT_IGNORED  0xFE
 #define CANNOT_HAPPEN  0xFF
@@ -35,10 +34,10 @@ typedef struct
 
 typedef struct 
 {
-    const char* name;
-    const unsigned char maxStates;
+    const CHAR* name;
+    const BYTE maxStates;
     const SM_StateStruct* stateMap;
-    unsigned char currentState;
+    BYTE currentState;
     BOOL eventGenerated;
     void* pEventData;
 } SM_StateMachine;
@@ -48,8 +47,8 @@ typedef struct
 #define SM_InternalEvent(_name_, _newState_, _data_) _SM_InternalEvent(&_name_##Obj, _newState_, _data_)
 
 // Private functions
-void _SM_ExternalEvent(SM_StateMachine* self, unsigned char newState, void* pData);
-void _SM_InternalEvent(SM_StateMachine* self, unsigned char newState, void* pData);
+void _SM_ExternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
+void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
 void _SM_StateEngine(SM_StateMachine* self);
 
 #define SM_DEFINE(_name_) \
@@ -67,14 +66,15 @@ void _SM_StateEngine(SM_StateMachine* self);
     };
 
 #define BEGIN_TRANSITION_MAP \
-    static const unsigned char TRANSITIONS[] = {\
+    static const BYTE TRANSITIONS[] = {\
 
 #define TRANSITION_MAP_ENTRY(entry)\
     entry,
 
 #define END_TRANSITION_MAP(_name_, _data_) \
-    0 };\
-    _SM_ExternalEvent(&_name_##Obj, TRANSITIONS[_name_##Obj.currentState], _data_);
+    };\
+    _SM_ExternalEvent(&_name_##Obj, TRANSITIONS[_name_##Obj.currentState], _data_); \
+    C_ASSERT((sizeof(TRANSITIONS)/sizeof(BYTE)) == (sizeof(_name_##StateMap)/sizeof(_name_##StateMap[0])));
 
 #ifdef __cplusplus
 }

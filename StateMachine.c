@@ -1,37 +1,48 @@
 #include "Fault.h"
 #include "StateMachine.h"
 
-void _SM_ExternalEvent(SM_StateMachine* self, unsigned char newState, void* pData)
+// Generates an external event. Called once per external event 
+// to start the state machine executing
+void _SM_ExternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
 {
+    ASSERT_TRUE(self);
+
     // If we are supposed to ignore this event
     if (newState == EVENT_IGNORED) 
     {
         // Just delete the event data, if any
-        if (pData)
-            SM_XFREE(pData);
+        if (pEventData)
+            SM_XFREE(pEventData);
     }
     else 
     {
         // TODO - capture software lock here for thread-safety if necessary
 
         // Generate the event and execute the state engine
-        _SM_InternalEvent(self, newState, pData);
+        _SM_InternalEvent(self, newState, pEventData);
         _SM_StateEngine(self);
 
         // TODO - release software lock here 
     }
 }
 
-void _SM_InternalEvent(SM_StateMachine* self, unsigned char newState, void* pData)
+// Generates an internal event. Called from within a state 
+// function to transition to a new state
+void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
 {
-    self->pEventData = pData;
+    ASSERT_TRUE(self);
+
+    self->pEventData = pEventData;
     self->eventGenerated = TRUE;
     self->currentState = newState;
 }
 
+// The state engine executes the state machine states
 void _SM_StateEngine(SM_StateMachine* self)
 {
     void* pDataTemp = NULL;
+
+    ASSERT_TRUE(self);
 
     // While events are being generated keep executing states
     while (self->eventGenerated) 
