@@ -1,7 +1,6 @@
 #ifndef _STATE_MACHINE_H
 #define _STATE_MACHINE_H
 
-#include <stdio.h>
 #include "DataTypes.h"
 #include "Fault.h"
 
@@ -21,8 +20,7 @@ extern "C" {
     #define SM_XFREE(ptr)      free(ptr)
 #endif
 
-#define EVENT_IGNORED  0xFE
-#define CANNOT_HAPPEN  0xFF
+enum { EVENT_IGNORED = 0xFE, CANNOT_HAPPEN = 0xFF };
 
 // Generic state function signature
 typedef void (*SM_StateFunc)(void*);
