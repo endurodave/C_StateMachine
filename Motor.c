@@ -1,4 +1,5 @@
 #include "Motor.h"
+#include "StateMachine.h"
 #include <stdio.h>
 
 // State enumeration order must match the order of state
