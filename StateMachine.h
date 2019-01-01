@@ -49,10 +49,10 @@ void _SM_ExternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
 void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
 void _SM_StateEngine(SM_StateMachine* self);
 
-#define SM_DEFINE(_name_) \
+#define SM_DEFINE(_name_, _initialState_) \
     static SM_StateMachine _name_##Obj = { #_name_, \
         (sizeof(_name_##StateMap)/sizeof(_name_##StateMap[0])), \
-        _name_##StateMap, 0, 0, 0 }; 
+        _name_##StateMap, _initialState_, 0, 0 }; 
 
 #define BEGIN_STATE_MAP(_name_) \
     static const SM_StateStruct _name_##StateMap[] = { 

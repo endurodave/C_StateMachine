@@ -27,7 +27,7 @@ BEGIN_STATE_MAP(Motor)
 END_STATE_MAP
 
 // Define the Motor state machine
-SM_DEFINE(Motor)
+SM_DEFINE(Motor, ST_IDLE)
 
 // Set motor speed external event
 void MTR_SetSpeed(MotorData* data)
@@ -82,6 +82,6 @@ static void ST_Start(MotorData* data)
 static void ST_ChangeSpeed(MotorData* data)
 {
     printf("ST_ChangeSpeed %d\n", data->speed);
-    // Perform the change motor speed to pData->speed here
+    // Perform the change motor speed to data->speed here
 }
 

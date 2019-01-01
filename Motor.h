@@ -9,6 +9,7 @@ typedef struct
     INT speed;
 } MotorData;
 
+// State machine event functions
 void MTR_SetSpeed(MotorData* data);
 void MTR_Halt(void);
 
