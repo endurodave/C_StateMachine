@@ -2,6 +2,10 @@
 #include "StateMachine.h"
 #include <stdio.h>
 
+// Define private instance of motor state machine
+Motor motorPrivate;
+SM_DEFINE(MotorPrivate, &motorPrivate)
+
 // State enumeration order must match the order of state
 // method entries in the state map
 enum States
@@ -14,10 +18,10 @@ enum States
 };
 
 // State machine state functions
-static void ST_Idle(void* data);
-static void ST_Stop(void* data);
-static void ST_Start(MotorData* data);
-static void ST_ChangeSpeed(MotorData* data);
+STATE_DECLARE(ST_Idle, void)
+STATE_DECLARE(ST_Stop, void)
+STATE_DECLARE(ST_Start, MotorData)
+STATE_DECLARE(ST_ChangeSpeed, MotorData)
 
 // State map to define state function order
 BEGIN_STATE_MAP(Motor)
@@ -25,13 +29,10 @@ BEGIN_STATE_MAP(Motor)
     STATE_MAP_ENTRY(ST_Stop)
     STATE_MAP_ENTRY(ST_Start)
     STATE_MAP_ENTRY(ST_ChangeSpeed)
-END_STATE_MAP
-
-// Define the Motor state machine
-SM_DEFINE(Motor, ST_IDLE)
+END_STATE_MAP(Motor)
 
 // Set motor speed external event
-void MTR_SetSpeed(MotorData* data)
+EVENT_DEFINE(MTR_SetSpeed, MotorData)
 {
     // Given the SetSpeed event, transition to a new state based upon 
     // the current state of the state machine
@@ -40,11 +41,11 @@ void MTR_SetSpeed(MotorData* data)
         TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)  // ST_Stop       
         TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)// ST_Start      
         TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)// ST_ChangeSpeed
-    END_TRANSITION_MAP(Motor, data)
+    END_TRANSITION_MAP(Motor, pEventData)
 }
 
 // Halt motor external event
-void MTR_Halt(void)
+EVENT_DEFINE(MTR_Halt, void)
 {
     // Given the Halt event, transition to a new state based upon 
     // the current state of the state machine
@@ -57,32 +58,44 @@ void MTR_Halt(void)
 }
 
 // State machine sits here when motor is not running
-static void ST_Idle(void* data)
+STATE_DEFINE(ST_Idle, void)
 {
-    printf("ST_Idle\n");
+    printf("%s ST_Idle\n", self->name);
 }
 
 // Stop the motor 
-static void ST_Stop(void* data)
+STATE_DEFINE(ST_Stop, void)
 {
-    printf("ST_Stop\n");
+    // Get pointer to the instance data and update currentSpeed
+    Motor* pInstance = SM_GetInstance(Motor);
+    pInstance->currentSpeed = 0;
 
     // Perform the stop motor processing here
+    printf("%s ST_Stop: %d\n", self->name, pInstance->currentSpeed);
+
     // Transition to ST_Idle via an internal event
-    SM_InternalEvent(Motor, ST_IDLE, NULL);
+    SM_InternalEvent(ST_IDLE, NULL);
 }
 
 // Start the motor going
-static void ST_Start(MotorData* data)
+STATE_DEFINE(ST_Start, MotorData)
 {
-    printf("ST_Start %d\n", data->speed);
+    // Get pointer to the instance data and update currentSpeed
+    Motor* pInstance = SM_GetInstance(Motor);
+    pInstance->currentSpeed = pEventData->speed;
+
+    printf("%s ST_Start: %d\n", self->name, pInstance->currentSpeed);
     // Set initial motor speed processing here
 }
 
 // Changes the motor speed once the motor is moving
-static void ST_ChangeSpeed(MotorData* data)
+STATE_DEFINE(ST_ChangeSpeed, MotorData)
 {
-    printf("ST_ChangeSpeed %d\n", data->speed);
+    // Get pointer to the instance data and update currentSpeed
+    Motor* pInstance = SM_GetInstance(Motor);
+    pInstance->currentSpeed = pEventData->speed;
+
+    printf("%s ST_ChangeSpeed: %d\n", self->name, pInstance->currentSpeed);
     // Perform the change motor speed to data->speed here
 }
 

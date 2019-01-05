@@ -3,16 +3,14 @@
 
 // Generates an external event. Called once per external event 
 // to start the state machine executing
-void _SM_ExternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
+void _SM_ExternalEvent(SM_StateMachine* self, SM_StateMachineConst* selfConst, BYTE newState, void* pEventData)
 {
-    ASSERT_TRUE(self);
-
     // If we are supposed to ignore this event
     if (newState == EVENT_IGNORED) 
     {
         // Just delete the event data, if any
         if (pEventData)
-            SM_XFREE(pEventData);
+            SM_XFree(pEventData);
     }
     else 
     {
@@ -20,7 +18,7 @@ void _SM_ExternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
 
         // Generate the event and execute the state engine
         _SM_InternalEvent(self, newState, pEventData);
-        _SM_StateEngine(self);
+        _SM_StateEngine(self, selfConst);
 
         // TODO - release software lock here 
     }
@@ -38,11 +36,12 @@ void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
 }
 
 // The state engine executes the state machine states
-void _SM_StateEngine(SM_StateMachine* self)
+void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst)
 {
     void* pDataTemp = NULL;
 
     ASSERT_TRUE(self);
+    ASSERT_TRUE(selfConst);
 
     // While events are being generated keep executing states
     while (self->eventGenerated) 
@@ -51,15 +50,15 @@ void _SM_StateEngine(SM_StateMachine* self)
         self->pEventData = NULL;       // event data used up, reset ptr
         self->eventGenerated = FALSE;  // event used up, reset flag
 
-        ASSERT_TRUE(self->currentState < self->maxStates);
+        ASSERT_TRUE(self->currentState < selfConst->maxStates);
 
-        // Execute the state passing in event data, if any
-        self->stateMap[self->currentState].pStateFunc(pDataTemp);
+        // Execute the state passing in self and event data, if any
+        selfConst->stateMap[self->currentState].pStateFunc(self, pDataTemp);
 
         // If event data was used, then delete it
         if (pDataTemp) 
         {
-            SM_XFREE(pDataTemp);
+            SM_XFree(pDataTemp);
             pDataTemp = NULL;
         }
     }
