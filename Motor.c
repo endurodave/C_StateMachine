@@ -80,6 +80,8 @@ STATE_DEFINE(ST_Stop, void)
 // Start the motor going
 STATE_DEFINE(ST_Start, MotorData)
 {
+    ASSERT_TRUE(pEventData);
+
     // Get pointer to the instance data and update currentSpeed
     Motor* pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
@@ -91,6 +93,8 @@ STATE_DEFINE(ST_Start, MotorData)
 // Changes the motor speed once the motor is moving
 STATE_DEFINE(ST_ChangeSpeed, MotorData)
 {
+    ASSERT_TRUE(pEventData);
+
     // Get pointer to the instance data and update currentSpeed
     Motor* pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
