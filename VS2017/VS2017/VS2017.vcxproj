@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\CentrifugeTest.h" />
     <ClInclude Include="..\..\DataTypes.h" />
     <ClInclude Include="..\..\Fault.h" />
     <ClInclude Include="..\..\fb_allocator.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="..\..\x_allocator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\CentrifugeTest.c" />
     <ClCompile Include="..\..\Fault.cpp" />
     <ClCompile Include="..\..\fb_allocator.c" />
     <ClCompile Include="..\..\LockGuard.cpp" />

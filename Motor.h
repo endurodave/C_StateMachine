@@ -4,9 +4,6 @@
 #include "DataTypes.h"
 #include "StateMachine.h"
 
-// Declare the private instance of Motor state machine
-SM_DECLARE(MotorPrivate)
-
 // Motor object structure
 typedef struct
 {
@@ -21,6 +18,6 @@ typedef struct
 
 // State machine event functions
 EVENT_DECLARE(MTR_SetSpeed, MotorData)
-EVENT_DECLARE(MTR_Halt, void)
+EVENT_DECLARE(MTR_Halt, NoEventData)
 
 #endif // _MOTOR_H

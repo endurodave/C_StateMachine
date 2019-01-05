@@ -2,10 +2,6 @@
 #include "StateMachine.h"
 #include <stdio.h>
 
-// Define private instance of motor state machine
-Motor motorPrivate;
-SM_DEFINE(MotorPrivate, &motorPrivate)
-
 // State enumeration order must match the order of state
 // method entries in the state map
 enum States
@@ -18,10 +14,10 @@ enum States
 };
 
 // State machine state functions
-STATE_DECLARE(ST_Idle, void)
-STATE_DECLARE(ST_Stop, void)
-STATE_DECLARE(ST_Start, MotorData)
-STATE_DECLARE(ST_ChangeSpeed, MotorData)
+STATE_DECLARE(Idle, NoEventData)
+STATE_DECLARE(Stop, NoEventData)
+STATE_DECLARE(Start, MotorData)
+STATE_DECLARE(ChangeSpeed, MotorData)
 
 // State map to define state function order
 BEGIN_STATE_MAP(Motor)
@@ -45,7 +41,7 @@ EVENT_DEFINE(MTR_SetSpeed, MotorData)
 }
 
 // Halt motor external event
-EVENT_DEFINE(MTR_Halt, void)
+EVENT_DEFINE(MTR_Halt, NoEventData)
 {
     // Given the Halt event, transition to a new state based upon 
     // the current state of the state machine
@@ -58,13 +54,13 @@ EVENT_DEFINE(MTR_Halt, void)
 }
 
 // State machine sits here when motor is not running
-STATE_DEFINE(ST_Idle, void)
+STATE_DEFINE(Idle, NoEventData)
 {
     printf("%s ST_Idle\n", self->name);
 }
 
 // Stop the motor 
-STATE_DEFINE(ST_Stop, void)
+STATE_DEFINE(Stop, NoEventData)
 {
     // Get pointer to the instance data and update currentSpeed
     Motor* pInstance = SM_GetInstance(Motor);
@@ -78,7 +74,7 @@ STATE_DEFINE(ST_Stop, void)
 }
 
 // Start the motor going
-STATE_DEFINE(ST_Start, MotorData)
+STATE_DEFINE(Start, MotorData)
 {
     ASSERT_TRUE(pEventData);
 
@@ -91,7 +87,7 @@ STATE_DEFINE(ST_Start, MotorData)
 }
 
 // Changes the motor speed once the motor is moving
-STATE_DEFINE(ST_ChangeSpeed, MotorData)
+STATE_DEFINE(ChangeSpeed, MotorData)
 {
     ASSERT_TRUE(pEventData);
 

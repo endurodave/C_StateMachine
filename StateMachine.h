@@ -30,12 +30,15 @@ extern "C" {
 
 enum { EVENT_IGNORED = 0xFE, CANNOT_HAPPEN = 0xFF };
 
+typedef void NoEventData;
+
 // State machine constant data
 typedef struct
 {
     const CHAR* name;
     const BYTE maxStates;
     const struct SM_StateStruct* stateMap;
+    const struct SM_StateStructEx* stateMapEx;
 } SM_StateMachineConst;
 
 // State machine instance data
@@ -43,18 +46,30 @@ typedef struct
 {
     const CHAR* name;
     void* pInstance;
+    BYTE newState;
     BYTE currentState;
     BOOL eventGenerated;
     void* pEventData;
 } SM_StateMachine;
 
-// Generic state function signature
-typedef void(*SM_StateFunc)(SM_StateMachine* self, void* eventData);
+// Generic state function signatures
+typedef void (*SM_StateFunc)(SM_StateMachine* self, void* eventData);
+typedef BOOL (*SM_GuardFunc)(SM_StateMachine* self, void* eventData);
+typedef void (*SM_EntryFunc)(SM_StateMachine* self, void* eventData);
+typedef void (*SM_ExitFunc)(SM_StateMachine* self);
 
 typedef struct SM_StateStruct
 {
     SM_StateFunc pStateFunc;
 } SM_StateStruct;
+
+typedef struct SM_StateStructEx
+{
+    SM_StateFunc pStateFunc;
+    SM_GuardFunc pGuardFunc;
+    SM_EntryFunc pEntryFunc;
+    SM_ExitFunc pExitFunc;
+} SM_StateStructEx;
 
 // Public functions
 #define SM_Event(_smName_, _eventFunc_, _eventData_) \
@@ -70,13 +85,14 @@ typedef struct SM_StateStruct
 void _SM_ExternalEvent(SM_StateMachine* self, SM_StateMachineConst* selfConst, BYTE newState, void* pEventData);
 void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
 void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst);
+void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 
 #define SM_DECLARE(_smName_) \
     extern SM_StateMachine _smName_##Obj; 
 
 #define SM_DEFINE(_smName_, _instance_) \
     SM_StateMachine _smName_##Obj = { #_smName_, _instance_, \
-        0, 0, 0 }; 
+        0, 0, 0, 0 }; 
 
 #define EVENT_DECLARE(_eventFunc_, _eventData_) \
     void _eventFunc_(SM_StateMachine* self, _eventData_* pEventData);
@@ -85,22 +101,55 @@ void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst);
     void _eventFunc_(SM_StateMachine* self, _eventData_* pEventData)
 
 #define STATE_DECLARE(_stateFunc_, _eventData_) \
-    static void _stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
+    static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
 #define STATE_DEFINE(_stateFunc_, _eventData_) \
-    static void _stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+    static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+
+#define GUARD_DECLARE(_stateFunc_, _eventData_) \
+    static BOOL GD_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
+
+#define GUARD_DEFINE(_stateFunc_, _eventData_) \
+    static BOOL GD_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+
+#define ENTRY_DECLARE(_stateFunc_, _eventData_) \
+    static void EN_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
+
+#define ENTRY_DEFINE(_stateFunc_, _eventData_) \
+    static void EN_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+
+#define EXIT_DECLARE(_stateFunc_) \
+    static void EX_##_stateFunc_(SM_StateMachine* self);
+
+#define EXIT_DEFINE(_stateFunc_) \
+    static void EX_##_stateFunc_(SM_StateMachine* self)
 
 #define BEGIN_STATE_MAP(_smName_) \
     static const SM_StateStruct _smName_##StateMap[] = { 
 
-#define STATE_MAP_ENTRY(stateFunc)\
-    { stateFunc },
+#define STATE_MAP_ENTRY(_stateFunc_) \
+    { _stateFunc_ },
 
 #define END_STATE_MAP(_smName_) \
     }; \
     static SM_StateMachineConst _smName_##Const = { #_smName_, \
         (sizeof(_smName_##StateMap)/sizeof(_smName_##StateMap[0])), \
-        _smName_##StateMap };
+        _smName_##StateMap, NULL };
+
+#define BEGIN_STATE_MAP_EX(_smName_) \
+    static const SM_StateStructEx _smName_##StateMap[] = { 
+
+#define STATE_MAP_ENTRY_EX(_stateFunc_) \
+    { _stateFunc_, NULL, NULL, NULL },
+
+#define STATE_MAP_ENTRY_ALL_EX(_stateFunc_, _guardName_, _entryName_, _exitName_) \
+    { _stateFunc_, _guardName_, _entryName_, _exitName_ },
+
+#define END_STATE_MAP_EX(_smName_) \
+    }; \
+    static SM_StateMachineConst _smName_##Const = { #_smName_, \
+        (sizeof(_smName_##StateMap)/sizeof(_smName_##StateMap[0])), \
+        NULL, _smName_##StateMap };
 
 #define BEGIN_TRANSITION_MAP \
     static const BYTE TRANSITIONS[] = { \
