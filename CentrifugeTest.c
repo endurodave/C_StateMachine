@@ -30,6 +30,7 @@ enum States
 
 // State machine state functions
 STATE_DECLARE(Idle, NoEventData)
+ENTRY_DECLARE(Idle, NoEventData)
 STATE_DECLARE(Completed, NoEventData)
 STATE_DECLARE(Failed, NoEventData)
 STATE_DECLARE(StartTest, NoEventData)
@@ -43,7 +44,7 @@ EXIT_DECLARE(WaitForDeceleration)
 
 // State map to define state function order
 BEGIN_STATE_MAP_EX(CentrifugeTest)
-    STATE_MAP_ENTRY_EX(ST_Idle)
+    STATE_MAP_ENTRY_ALL_EX(ST_Idle, 0, EN_Idle, 0)
     STATE_MAP_ENTRY_EX(ST_Completed)
     STATE_MAP_ENTRY_EX(ST_Failed)
     STATE_MAP_ENTRY_ALL_EX(ST_StartTest, GD_StartTest, 0, 0)
@@ -110,10 +111,14 @@ BOOL CFG_IsPollActive()
     return centrifugeTestObj.pollActive;
 }
 
-// Idle state here overrides the SelfTest Idle state. 
 STATE_DEFINE(Idle, NoEventData)
 {
     printf("%s ST_Idle\n", self->name);
+}
+
+ENTRY_DEFINE(Idle, NoEventData)
+{
+    printf("%s EN_Idle\n", self->name);
     StopPoll();
 }
 
@@ -139,7 +144,7 @@ STATE_DEFINE(StartTest, NoEventData)
 // Guard condition to detemine whether StartTest state is executed.
 GUARD_DEFINE(StartTest, NoEventData)
 {
-    printf("%s GD_GuardStartTest\n", self->name);
+    printf("%s GD_StartTest\n", self->name);
     if (centrifugeTestObj.speed == 0)
         return TRUE;    // Centrifuge stopped. OK to start test.
     else
