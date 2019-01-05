@@ -98,7 +98,7 @@ void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 
 #define END_STATE_MAP(_smName_) \
     }; \
-    SM_StateMachineConst _smName_##Const = { #_smName_, \
+    static SM_StateMachineConst _smName_##Const = { #_smName_, \
         (sizeof(_smName_##StateMap)/sizeof(_smName_##StateMap[0])), \
         _smName_##StateMap };
 
