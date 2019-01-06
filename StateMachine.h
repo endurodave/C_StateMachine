@@ -106,23 +106,23 @@ void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 #define STATE_DEFINE(_stateFunc_, _eventData_) \
     static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
 
-#define GUARD_DECLARE(_stateFunc_, _eventData_) \
-    static BOOL GD_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
+#define GUARD_DECLARE(_guardFunc_, _eventData_) \
+    static BOOL GD_##_guardFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
-#define GUARD_DEFINE(_stateFunc_, _eventData_) \
-    static BOOL GD_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+#define GUARD_DEFINE(_guardFunc_, _eventData_) \
+    static BOOL GD_##_guardFunc_(SM_StateMachine* self, _eventData_* pEventData)
 
-#define ENTRY_DECLARE(_stateFunc_, _eventData_) \
-    static void EN_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
+#define ENTRY_DECLARE(_entryFunc_, _eventData_) \
+    static void EN_##_entryFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
-#define ENTRY_DEFINE(_stateFunc_, _eventData_) \
-    static void EN_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+#define ENTRY_DEFINE(_entryFunc_, _eventData_) \
+    static void EN_##_entryFunc_(SM_StateMachine* self, _eventData_* pEventData)
 
-#define EXIT_DECLARE(_stateFunc_) \
-    static void EX_##_stateFunc_(SM_StateMachine* self);
+#define EXIT_DECLARE(_exitFunc_) \
+    static void EX_##_exitFunc_(SM_StateMachine* self);
 
-#define EXIT_DEFINE(_stateFunc_) \
-    static void EX_##_stateFunc_(SM_StateMachine* self)
+#define EXIT_DEFINE(_exitFunc_) \
+    static void EX_##_exitFunc_(SM_StateMachine* self)
 
 #define BEGIN_STATE_MAP(_smName_) \
     static const SM_StateStruct _smName_##StateMap[] = { 
@@ -142,8 +142,8 @@ void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 #define STATE_MAP_ENTRY_EX(_stateFunc_) \
     { _stateFunc_, NULL, NULL, NULL },
 
-#define STATE_MAP_ENTRY_ALL_EX(_stateFunc_, _guardName_, _entryName_, _exitName_) \
-    { _stateFunc_, _guardName_, _entryName_, _exitName_ },
+#define STATE_MAP_ENTRY_ALL_EX(_stateFunc_, _guardFunc_, _entryFunc_, _exitFunc_) \
+    { _stateFunc_, _guardFunc_, _entryFunc_, _exitFunc_ },
 
 #define END_STATE_MAP_EX(_smName_) \
     }; \
@@ -154,8 +154,8 @@ void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 #define BEGIN_TRANSITION_MAP \
     static const BYTE TRANSITIONS[] = { \
 
-#define TRANSITION_MAP_ENTRY(entry) \
-    entry,
+#define TRANSITION_MAP_ENTRY(_entry_) \
+    _entry_,
 
 #define END_TRANSITION_MAP(_smName_, _eventData_) \
     }; \
