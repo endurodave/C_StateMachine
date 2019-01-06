@@ -1,7 +1,7 @@
 // The StateMachine module is a C language implementation of a finite state 
 // machine (FSM).
 //
-// All event data must be created on the heap using SM_XAlloc. Use a fixed 
+// All event data must be created dynamically using SM_XAlloc. Use a fixed 
 // block allocator or the heap as desired. 
 //
 // Macros are used to assist in creating the state machine machinery. 

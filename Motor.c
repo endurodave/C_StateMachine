@@ -32,11 +32,11 @@ EVENT_DEFINE(MTR_SetSpeed, MotorData)
 {
     // Given the SetSpeed event, transition to a new state based upon 
     // the current state of the state machine
-    BEGIN_TRANSITION_MAP                     // - Current State -
-        TRANSITION_MAP_ENTRY(ST_START)       // ST_Idle       
-        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)  // ST_Stop       
-        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)// ST_Start      
-        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)// ST_ChangeSpeed
+    BEGIN_TRANSITION_MAP                        // - Current State -
+        TRANSITION_MAP_ENTRY(ST_START)          // ST_Idle       
+        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)     // ST_Stop       
+        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)   // ST_Start      
+        TRANSITION_MAP_ENTRY(ST_CHANGE_SPEED)   // ST_ChangeSpeed
     END_TRANSITION_MAP(Motor, pEventData)
 }
 
@@ -45,12 +45,12 @@ EVENT_DEFINE(MTR_Halt, NoEventData)
 {
     // Given the Halt event, transition to a new state based upon 
     // the current state of the state machine
-    BEGIN_TRANSITION_MAP                     // - Current State -
-        TRANSITION_MAP_ENTRY(EVENT_IGNORED)  // ST_Idle
-        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)  // ST_Stop
-        TRANSITION_MAP_ENTRY(ST_STOP)        // ST_Start
-        TRANSITION_MAP_ENTRY(ST_STOP)        // ST_ChangeSpeed
-    END_TRANSITION_MAP(Motor, NULL)
+    BEGIN_TRANSITION_MAP                        // - Current State -
+        TRANSITION_MAP_ENTRY(EVENT_IGNORED)     // ST_Idle
+        TRANSITION_MAP_ENTRY(CANNOT_HAPPEN)     // ST_Stop
+        TRANSITION_MAP_ENTRY(ST_STOP)           // ST_Start
+        TRANSITION_MAP_ENTRY(ST_STOP)           // ST_ChangeSpeed
+    END_TRANSITION_MAP(Motor, pEventData)
 }
 
 // State machine sits here when motor is not running
@@ -82,8 +82,8 @@ STATE_DEFINE(Start, MotorData)
     Motor* pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
 
-    printf("%s ST_Start: %d\n", self->name, pInstance->currentSpeed);
     // Set initial motor speed processing here
+    printf("%s ST_Start: %d\n", self->name, pInstance->currentSpeed);
 }
 
 // Changes the motor speed once the motor is moving
@@ -95,7 +95,7 @@ STATE_DEFINE(ChangeSpeed, MotorData)
     Motor* pInstance = SM_GetInstance(Motor);
     pInstance->currentSpeed = pEventData->speed;
 
+    // Perform the change motor speed here
     printf("%s ST_ChangeSpeed: %d\n", self->name, pInstance->currentSpeed);
-    // Perform the change motor speed to data->speed here
 }
 

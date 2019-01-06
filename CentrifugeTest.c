@@ -65,7 +65,7 @@ EVENT_DEFINE(CFG_Start, NoEventData)
         TRANSITION_MAP_ENTRY(EVENT_IGNORED)             // ST_WAIT_FOR_ACCELERATION
         TRANSITION_MAP_ENTRY(EVENT_IGNORED)             // ST_DECELERATION
         TRANSITION_MAP_ENTRY(EVENT_IGNORED)             // ST_WAIT_FOR_DECELERATION
-    END_TRANSITION_MAP(CentrifugeTest, NULL)
+    END_TRANSITION_MAP(CentrifugeTest, pEventData)
 }
 
 EVENT_DEFINE(CFG_Cancel, NoEventData)
@@ -79,7 +79,7 @@ EVENT_DEFINE(CFG_Cancel, NoEventData)
         TRANSITION_MAP_ENTRY(ST_FAILED)                 // ST_WAIT_FOR_ACCELERATION
         TRANSITION_MAP_ENTRY(ST_FAILED)                 // ST_DECELERATION
         TRANSITION_MAP_ENTRY(ST_FAILED)                 // ST_WAIT_FOR_DECELERATION
-    END_TRANSITION_MAP(CentrifugeTest, NULL)
+    END_TRANSITION_MAP(CentrifugeTest, pEventData)
 }
 
 EVENT_DEFINE(CFG_Poll, NoEventData)
@@ -93,7 +93,7 @@ EVENT_DEFINE(CFG_Poll, NoEventData)
         TRANSITION_MAP_ENTRY(ST_WAIT_FOR_ACCELERATION)      // ST_WAIT_FOR_ACCELERATION
         TRANSITION_MAP_ENTRY(ST_WAIT_FOR_DECELERATION)      // ST_DECELERATION
         TRANSITION_MAP_ENTRY(ST_WAIT_FOR_DECELERATION)      // ST_WAIT_FOR_DECELERATION
-    END_TRANSITION_MAP(CentrifugeTest, NULL)
+    END_TRANSITION_MAP(CentrifugeTest, pEventData)
 }
 
 static void StartPoll()
@@ -119,6 +119,7 @@ STATE_DEFINE(Idle, NoEventData)
 ENTRY_DEFINE(Idle, NoEventData)
 {
     printf("%s EN_Idle\n", self->name);
+    centrifugeTestObj.speed = 0;
     StopPoll();
 }
 
