@@ -142,7 +142,7 @@ STATE_DEFINE(StartTest, NoEventData)
     SM_InternalEvent(ST_ACCELERATION, NULL);
 }
 
-// Guard condition to detemine whether StartTest state is executed.
+// Guard condition to determine whether StartTest state is executed.
 GUARD_DEFINE(StartTest, NoEventData)
 {
     printf("%s GD_StartTest\n", self->name);

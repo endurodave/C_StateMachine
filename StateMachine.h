@@ -4,6 +4,10 @@
 // All event data must be created dynamically using SM_XAlloc. Use a fixed 
 // block allocator or the heap as desired. 
 //
+// The base version (non-EX) supports state and event functions. The extended 
+// version (EX) supports the additional guard, entry and exit state
+// machine features. 
+//
 // Macros are used to assist in creating the state machine machinery. 
 
 #ifndef _STATE_MACHINE_H
@@ -53,9 +57,9 @@ typedef struct
 } SM_StateMachine;
 
 // Generic state function signatures
-typedef void (*SM_StateFunc)(SM_StateMachine* self, void* eventData);
-typedef BOOL (*SM_GuardFunc)(SM_StateMachine* self, void* eventData);
-typedef void (*SM_EntryFunc)(SM_StateMachine* self, void* eventData);
+typedef void (*SM_StateFunc)(SM_StateMachine* self, void* pEventData);
+typedef BOOL (*SM_GuardFunc)(SM_StateMachine* self, void* pEventData);
+typedef void (*SM_EntryFunc)(SM_StateMachine* self, void* pEventData);
 typedef void (*SM_ExitFunc)(SM_StateMachine* self);
 
 typedef struct SM_StateStruct
