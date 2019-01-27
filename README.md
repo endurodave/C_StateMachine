@@ -67,27 +67,27 @@ switch (currentState) {
 <p>These events are not state machine states. The steps required to handle these two events are different. In this case the states are:</p>
 
 <ol>
-	<li><strong>Idle -&nbsp;</strong>the motor is not spinning but is at rest.
+	<li><strong>Idle</strong> &mdash; the motor is not spinning but is at rest
 
 	<ul>
-		<li>Do nothing.</li>
+		<li>Do nothing</li>
 	</ul>
 	</li>
-	<li><strong>Start -&nbsp;</strong>starts the motor from a dead stop.
+	<li><strong>Start</strong> &mdash; starts the motor from a dead stop
 	<ul>
-		<li>Turn on motor power.</li>
-		<li>Set motor speed.</li>
+		<li>Turn on motor power</li>
+		<li>Set motor speed</li>
 	</ul>
 	</li>
-	<li><strong>Change Speed</strong>&nbsp;- adjust the speed of an already moving motor.
+	<li><strong>Change Speed</strong> &mdash; adjust the speed of an already moving motor
 	<ul>
-		<li>Change motor speed.</li>
+		<li>Change motor speed</li>
 	</ul>
 	</li>
-	<li><strong>Stop -</strong>&nbsp;stop a moving motor.
+	<li><strong>Stop</strong> &mdash; stop a moving motor
 	<ul>
-		<li>Turn off motor power.</li>
-		<li>Go to the Idle state.</li>
+		<li>Turn off motor power</li>
+		<li>Go to the Idle state</li>
 	</ul>
 	</li>
 </ol>
@@ -729,6 +729,3 @@ GUARD_DEFINE(StartTest, NoEventData)
 	<li><a href="https://www.codeproject.com/Articles/1272619/A-Fixed-Block-Memory-Allocator-in-C">A Fixed Block Allocator in C</a> - by David Lafreniere</li>
 </ul>
 
-<h2>History</h2>
-
-<p>&nbsp;</p>
