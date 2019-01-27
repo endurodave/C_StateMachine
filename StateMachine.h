@@ -1,11 +1,13 @@
+// https://www.codeproject.com/Articles/1275479/State-Machine-Design-in-C
+//
 // The StateMachine module is a C language implementation of a finite state 
 // machine (FSM).
 //
 // All event data must be created dynamically using SM_XAlloc. Use a fixed 
 // block allocator or the heap as desired. 
 //
-// The base version (non-EX) supports state and event functions. The extended 
-// version (EX) supports the additional guard, entry and exit state
+// The standard version (non-EX) supports state and event functions. The 
+// extended version (EX) supports the additional guard, entry and exit state
 // machine features. 
 //
 // Macros are used to assist in creating the state machine machinery. 
