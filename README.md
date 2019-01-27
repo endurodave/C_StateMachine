@@ -67,30 +67,38 @@ switch (currentState) {
 <p>These events are not state machine states. The steps required to handle these two events are different. In this case the states are:</p>
 
 <ol>
-	<li><strong>Idle</strong> &mdash; the motor is not spinning but is at rest
-
-	<ul>
-		<li>Do nothing</li>
-	</ul>
-	</li>
-	<li><strong>Start</strong> &mdash; starts the motor from a dead stop
-	<ul>
-		<li>Turn on motor power</li>
-		<li>Set motor speed</li>
-	</ul>
-	</li>
-	<li><strong>Change Speed</strong> &mdash; adjust the speed of an already moving motor
-	<ul>
-		<li>Change motor speed</li>
-	</ul>
-	</li>
-	<li><strong>Stop</strong> &mdash; stop a moving motor
-	<ul>
-		<li>Turn off motor power</li>
-		<li>Go to the Idle state</li>
-	</ul>
-	</li>
+	<li><strong>Idle </strong>&mdash; the motor is not spinning but is at rest.</li>
 </ol>
+
+<ul>
+	<li>Do nothing.</li>
+</ul>
+
+<ol start="2">
+	<li><strong>Start </strong>&mdash; starts the motor from a dead stop.</li>
+</ol>
+
+<ul>
+	<li>Turn on motor power.</li>
+	<li>Set motor speed.</li>
+</ul>
+
+<ol start="3">
+	<li><strong>Change Speed </strong>&mdash; adjust the speed of an already moving motor.</li>
+</ol>
+
+<ul>
+	<li>Change motor speed.</li>
+</ul>
+
+<ol start="4">
+	<li><strong>Stop </strong>&mdash; stop a moving motor.</li>
+</ol>
+
+<ul>
+	<li>Turn off motor power.</li>
+	<li>Go to the Idle state.</li>
+</ul>
 
 <p>As can be seen, breaking the motor control into discreet states, as opposed to having one monolithic function, we can more easily manage the rules of how to operate the motor.</p>
 
