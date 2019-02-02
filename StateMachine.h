@@ -88,10 +88,10 @@ typedef struct SM_StateStructEx
     (_instance_*)(self->pInstance);
 
 // Private functions
-void _SM_ExternalEvent(SM_StateMachine* self, SM_StateMachineConst* selfConst, BYTE newState, void* pEventData);
+void _SM_ExternalEvent(SM_StateMachine* self, const SM_StateMachineConst* selfConst, BYTE newState, void* pEventData);
 void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
-void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst);
-void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
+void _SM_StateEngine(SM_StateMachine* self, const SM_StateMachineConst* selfConst);
+void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfConst);
 
 #define SM_DECLARE(_smName_) \
     extern SM_StateMachine _smName_##Obj; 
@@ -138,7 +138,7 @@ void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 
 #define END_STATE_MAP(_smName_) \
     }; \
-    static SM_StateMachineConst _smName_##Const = { #_smName_, \
+    static const SM_StateMachineConst _smName_##Const = { #_smName_, \
         (sizeof(_smName_##StateMap)/sizeof(_smName_##StateMap[0])), \
         _smName_##StateMap, NULL };
 
@@ -153,7 +153,7 @@ void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
 
 #define END_STATE_MAP_EX(_smName_) \
     }; \
-    static SM_StateMachineConst _smName_##Const = { #_smName_, \
+    static const SM_StateMachineConst _smName_##Const = { #_smName_, \
         (sizeof(_smName_##StateMap)/sizeof(_smName_##StateMap[0])), \
         NULL, _smName_##StateMap };
 

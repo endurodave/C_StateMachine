@@ -3,7 +3,7 @@
 
 // Generates an external event. Called once per external event 
 // to start the state machine executing
-void _SM_ExternalEvent(SM_StateMachine* self, SM_StateMachineConst* selfConst, BYTE newState, void* pEventData)
+void _SM_ExternalEvent(SM_StateMachine* self, const SM_StateMachineConst* selfConst, BYTE newState, void* pEventData)
 {
     // If we are supposed to ignore this event
     if (newState == EVENT_IGNORED) 
@@ -41,7 +41,7 @@ void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData)
 }
 
 // The state engine executes the state machine states
-void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst)
+void _SM_StateEngine(SM_StateMachine* self, const SM_StateMachineConst* selfConst)
 {
     void* pDataTemp = NULL;
 
@@ -83,7 +83,7 @@ void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst)
 }
 
 // The state engine executes the extended state machine states
-void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst)
+void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfConst)
 {
     BOOL guardResult = TRUE;
     void* pDataTemp = NULL;
