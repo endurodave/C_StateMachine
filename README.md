@@ -11,7 +11,7 @@ See related compact state machine Git project <a href="https://github.com/enduro
 
 <p>In 2000, I wrote an article entitled &quot;<em>State Machine Design in C++</em>&quot; for C/C++ Users Journal (R.I.P.). Interestingly, that old article is still available and (at the time of writing this article) the #1 hit on Google when searching for C++ state machine. The article was written over 15 years ago, but I continue to use the basic idea on numerous projects. It&#39;s compact, easy to understand and, in most cases, has just enough features to accomplish what I need.</p>
 
-<p>Sometimes C is the correct tool for the job. This article provides an alternate C language state machine implementation based on the ideas presented within the article &ldquo;<em>State Machine Design in C++</em>&rdquo;. The design is suitable for any platform, embedded or PC, with any C compiler. This state machine has the following features:</p>
+<p>Sometimes C is the right tool for the job. This article provides an alternate C language state machine implementation based on the ideas presented within the article &ldquo;<em>State Machine Design in C++</em>&rdquo;. The design is suitable for any platform, embedded or PC, with any C compiler. This state machine has the following features:</p>
 
 <ul>
 	<li><strong>C language</strong> &ndash; state machine written in C</li>
@@ -20,7 +20,7 @@ See related compact state machine Git project <a href="https://github.com/enduro
 	<li><strong>Transition tables</strong> &ndash; transition tables precisely control state transition behavior.</li>
 	<li><strong>Events </strong>&ndash; every event is a simple function with any argument types.</li>
 	<li><strong>State action</strong> &ndash; every state action is a separate function with a single, unique event data argument if desired.</li>
-	<li><strong>Guards/entry/exit actions</strong>&nbsp;&ndash; Optionally a state machine can use guard conditions and separate entry/exit action functions for each state.</li>
+	<li><strong>Guards/entry/exit actions</strong>&nbsp;&ndash; optionally a state machine can use guard conditions and separate entry/exit action functions for each state.</li>
 	<li><strong>Macros </strong>&ndash; optional multiline macro support simplifies usage by automating the code &quot;machinery&quot;.</li>
 	<li><strong>Error checking</strong> &ndash; compile time and runtime checks catch mistakes early.</li>
 	<li><strong>Thread-safe</strong> &ndash; adding software locks to make the code thread-safe is easy.</li>
@@ -67,38 +67,30 @@ switch (currentState) {
 <p>These events are not state machine states. The steps required to handle these two events are different. In this case the states are:</p>
 
 <ol>
-	<li><strong>Idle </strong>&mdash; the motor is not spinning but is at rest.</li>
+	<li><strong>Idle</strong> &mdash; the motor is not spinning but is at rest
+
+	<ul>
+		<li>Do nothing</li>
+	</ul>
+	</li>
+	<li><strong>Start</strong> &mdash; starts the motor from a dead stop
+	<ul>
+		<li>Turn on motor power</li>
+		<li>Set motor speed</li>
+	</ul>
+	</li>
+	<li><strong>Change Speed</strong> &mdash; adjust the speed of an already moving motor
+	<ul>
+		<li>Change motor speed</li>
+	</ul>
+	</li>
+	<li><strong>Stop</strong> &mdash; stop a moving motor
+	<ul>
+		<li>Turn off motor power</li>
+		<li>Go to the Idle state</li>
+	</ul>
+	</li>
 </ol>
-
-<ul>
-	<li>Do nothing.</li>
-</ul>
-
-<ol start="2">
-	<li><strong>Start </strong>&mdash; starts the motor from a dead stop.</li>
-</ol>
-
-<ul>
-	<li>Turn on motor power.</li>
-	<li>Set motor speed.</li>
-</ul>
-
-<ol start="3">
-	<li><strong>Change Speed </strong>&mdash; adjust the speed of an already moving motor.</li>
-</ol>
-
-<ul>
-	<li>Change motor speed.</li>
-</ul>
-
-<ol start="4">
-	<li><strong>Stop </strong>&mdash; stop a moving motor.</li>
-</ol>
-
-<ul>
-	<li>Turn off motor power.</li>
-	<li>Go to the Idle state.</li>
-</ul>
 
 <p>As can be seen, breaking the motor control into discreet states, as opposed to having one monolithic function, we can more easily manage the rules of how to operate the motor.</p>
 
@@ -136,7 +128,7 @@ switch (currentState) {
 
 <h2>StateMachine module</h2>
 
-<p>The state machine source code is contained within the <strong>StateMachine.c</strong> and <strong>StateMachine.h</strong> files. The code below shows the partial header. The <strong><code>StateMachine</code> </strong>header contains various preprocessor multiline macros to ease implementation of the state machine.</p>
+<p>The state machine source code is contained within the <strong>StateMachine.c</strong> and <strong>StateMachine.h</strong> files. The code below shows the partial header. The <strong><code>StateMachine</code> </strong>header contains various preprocessor multiline macros to ease implementation of a state machine.</p>
 
 <pre lang="c++">
 enum { EVENT_IGNORED = 0xFE, CANNOT_HAPPEN = 0xFF };
@@ -193,10 +185,10 @@ typedef struct SM_StateStructEx
     (_instance_*)(self-&gt;pInstance);
 
 // Private functions
-void _SM_ExternalEvent(SM_StateMachine* self, SM_StateMachineConst* selfConst, BYTE newState, void* pEventData);
+void _SM_ExternalEvent(SM_StateMachine* self, const SM_StateMachineConst* selfConst, BYTE newState, void* pEventData);
 void _SM_InternalEvent(SM_StateMachine* self, BYTE newState, void* pEventData);
-void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst);
-void _SM_StateEngineEx(SM_StateMachine* self, SM_StateMachineConst* selfConst);
+void _SM_StateEngine(SM_StateMachine* self, const SM_StateMachineConst* selfConst);
+void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfConst);
 
 #define SM_DECLARE(_smName_) \
     extern SM_StateMachine _smName_##Obj; 
@@ -244,8 +236,6 @@ typedef struct
 // State machine event functions
 EVENT_DECLARE(MTR_SetSpeed, MotorData)
 EVENT_DECLARE(MTR_Halt, NoEventData)</pre>
-
-<p><code>MTR_SetSpeed </code>and <code>MTR_Halt</code> are considered external events into the <code>Motor</code> state machine. <code>MTR_SetSpeed </code>takes a pointer to <code>MotorData</code> event data, containing the motor speed. This data structure will be freed using <code>SM_XFree()</code> upon completion of the state processing, so it is imperative that it be created using <code>SM_XAlloc()</code> before the function call is made.</p>
 
 <p>The <code>Motor</code> source file uses macros to simplify usage by hiding the required state machine machinery.</p>
 
@@ -300,6 +290,10 @@ EVENT_DEFINE(MTR_Halt, NoEventData)
         TRANSITION_MAP_ENTRY(ST_STOP)           // ST_ChangeSpeed
     END_TRANSITION_MAP(Motor, pEventData)
 }</pre>
+
+<h3>External events</h3>
+
+<p><code>MTR_SetSpeed </code>and <code>MTR_Halt</code> are considered external events into the <code>Motor</code> state machine. <code>MTR_SetSpeed </code>takes a pointer to <code>MotorData</code> event data, containing the motor speed. This data structure will be freed using <code>SM_XFree()</code> upon completion of the state processing, so it is imperative that it be created using <code>SM_XAlloc()</code> before the function call is made.</p>
 
 <h3>State enumerations</h3>
 
@@ -446,9 +440,9 @@ END_STATE_MAP_EX(CentrifugeTest)</pre>
 
 <h3>State machine objects</h3>
 
-<p>In C++, objects are integral to the language. Using C, you have to work a bit harder to accomplish similar behavior. This C language state machine supports multiple state machine objects (or instances) instead of have a single, static state machine implementation.</p>
+<p>In C++, objects are integral to the language. Using C, you have to work a bit harder to accomplish similar behavior. This C language state machine supports multiple state machine objects (or instances) instead of having&nbsp;a single, static state machine implementation.</p>
 
-<p><code>SM_StateMachine </code>and <code>SM_StateMachineConst </code>structures are used for each state machine instance. Instance data is stored in <code>SM_StateMachine </code>whereas constant data is located within <code>SM_StateMachineConst</code>.</p>
+<p>The <code>SM_StateMachine </code>data structure stores state machine instance data; one object per state machine instance. The&nbsp;<code>SM_StateMachineConst </code>data structure stores constant data; one constant object per state machine type.</p>
 
 <p>The state machine is defined using <code>SM_DEFINE </code>macro. The first argument is the state machine name. The second argument is a pointer to a user defined state machine structure, or <code>NULL </code>if no user object.</p>
 
@@ -537,7 +531,7 @@ TRANSITION_MAP_ENTRY (ST_STOP)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <
 
 <h2>State engine</h2>
 
-<p>The state engine executes the state functions based upon events generated. The transition map is an array of <code>SM_StateStruct</code> instances indexed by the currentState variable. When the <code>_SM_StateEngine()</code> function executes, it looks up the correct state function within the <code>SM_StateStruct </code>array. After the state function has a chance to execute, it frees the event data, if any, before checking to see if any internal events were generated via <code>SM_InternalEvent()</code>.</p>
+<p>The state engine executes the state functions based upon events generated. The transition map is an array of <code>SM_StateStruct</code> instances indexed by the <code>currentState </code>variable. When the <code>_SM_StateEngine()</code> function executes, it looks up the correct state function within the <code>SM_StateStruct </code>array. After the state function has a chance to execute, it frees the event data, if any, before checking to see if any internal events were generated via <code>SM_InternalEvent()</code>.</p>
 
 <pre lang="c++">
 // The state engine executes the state machine states
@@ -728,7 +722,7 @@ GUARD_DEFINE(StartTest, NoEventData)
 
 <p>Implementing a state machine using this method as opposed to the old switch statement style may seem like extra effort. However, the payoff is in a more robust design that is capable of being employed uniformly over an entire multithreaded system. Having each state in its own function provides easier reading than a single huge <code>switch</code> statement, and allows unique event data to be sent to each state. In addition, validating state transitions prevents client misuse by eliminating the side effects caused by unwanted state transitions.</p>
 
-<p>This C language version is direct translation of a C++ implementation I&rsquo;ve used for many years on different projects. Consider the C++ implementation within the <strong>References </strong>section if using C++.</p>
+<p>This C language version is a close translation of the&nbsp;C++ implementation I&rsquo;ve used for many years on different projects. Consider the C++ implementation within the <strong>References </strong>section if using C++.</p>
 
 <h2>References</h2>
 
@@ -736,4 +730,3 @@ GUARD_DEFINE(StartTest, NoEventData)
 	<li><a href="https://www.codeproject.com/Articles/1087619/State-Machine-Design-in-Cplusplus-2">State Machine Design in C++</a> - by David Lafreniere</li>
 	<li><a href="https://www.codeproject.com/Articles/1272619/A-Fixed-Block-Memory-Allocator-in-C">A Fixed Block Allocator in C</a> - by David Lafreniere</li>
 </ul>
-
