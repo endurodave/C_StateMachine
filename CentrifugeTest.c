@@ -96,17 +96,17 @@ EVENT_DEFINE(CFG_Poll, NoEventData)
     END_TRANSITION_MAP(CentrifugeTest, pEventData)
 }
 
-static void StartPoll()
+static void StartPoll(void)
 {
     centrifugeTestObj.pollActive = TRUE;
 }
 
-static void StopPoll()
+static void StopPoll(void)
 {
     centrifugeTestObj.pollActive = FALSE;
 }
 
-BOOL CFG_IsPollActive() 
+BOOL CFG_IsPollActive(void) 
 { 
     return centrifugeTestObj.pollActive;
 }
