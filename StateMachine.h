@@ -80,6 +80,8 @@ typedef struct SM_StateStructEx
 // Public functions
 #define SM_Event(_smName_, _eventFunc_, _eventData_) \
     _eventFunc_(&_smName_##Obj, _eventData_)
+#define SM_Get(_smName_, _getFunc_) \
+    _getFunc_(&_smName_##Obj)
 
 // Protected functions
 #define SM_InternalEvent(_newState_, _eventData_) \
@@ -105,6 +107,12 @@ void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfCo
 
 #define EVENT_DEFINE(_eventFunc_, _eventData_) \
     void _eventFunc_(SM_StateMachine* self, _eventData_* pEventData)
+
+#define GET_DECLARE(_getFunc_, _getData_) \
+    _getData_ _getFunc_(SM_StateMachine* self);
+
+#define GET_DEFINE(_getFunc_, _getData_) \
+    _getData_ _getFunc_(SM_StateMachine* self)
 
 #define STATE_DECLARE(_stateFunc_, _eventData_) \
     static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);

@@ -20,4 +20,7 @@ typedef struct
 EVENT_DECLARE(MTR_SetSpeed, MotorData)
 EVENT_DECLARE(MTR_Halt, NoEventData)
 
+// Public accessor
+GET_DECLARE(MTR_GetSpeed, INT);
+
 #endif // _MOTOR_H

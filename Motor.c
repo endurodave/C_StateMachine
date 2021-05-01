@@ -99,3 +99,10 @@ STATE_DEFINE(ChangeSpeed, MotorData)
     printf("%s ST_ChangeSpeed: %d\n", self->name, pInstance->currentSpeed);
 }
 
+// Get current speed
+GET_DEFINE(MTR_GetSpeed, INT)
+{
+    Motor* pInstance = SM_GetInstance(Motor);
+    return pInstance->currentSpeed;
+}
+
