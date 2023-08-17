@@ -3,21 +3,14 @@
 #include "Fault.h"
 #include <string.h>
 
-// Define USE_LOCK to use the default lock implementation
-#define USE_LOCKS
-#ifdef USE_LOCKS
-    #include "LockGuard.h"
-    static LOCK_HANDLE _hLock;
-#else
-    #pragma message("WARNING: Define software lock.")
-    typedef int LOCK_HANDLE;
-    static LOCK_HANDLE _hLock;
+#pragma message("WARNING: Define software lock.")
+typedef int LOCK_HANDLE;
+static LOCK_HANDLE _hLock;
 
-    #define LK_CREATE()     (1)
-    #define LK_DESTROY(h)  
-    #define LK_LOCK(h)    
-    #define LK_UNLOCK(h)  
-#endif
+#define LK_CREATE()     (1)
+#define LK_DESTROY(h)
+#define LK_LOCK(h)
+#define LK_UNLOCK(h)
 
 // Get a pointer to the client's area within a memory block
 #define GET_CLIENT_PTR(_block_ptr_) \
