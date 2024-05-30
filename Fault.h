@@ -6,9 +6,10 @@ extern "C" {
 #endif
 
 // Used for compile-time checking for array sizes. On Windows VC++, you get 
-// an "error C2118: negative subscript" error.
+// an "error C2118: negative subscript" error. On GCC: size of "unnamed array is negative"
 #ifndef C_ASSERT
-#define C_ASSERT(expr)  {char uname[(expr)?1:-1];uname[0]=0;}
+//#define C_ASSERT(expr)  {char uname[(expr)?1:-1];uname[0]=0;}		// Original macro
+#define C_ASSERT(expr)  ((void)sizeof(char[(expr) ? 1 : -1]))		// New macro to fix GCC warning
 #endif
 
 #define ASSERT() \
