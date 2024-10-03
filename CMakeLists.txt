@@ -16,6 +16,7 @@ project(C_StateMachine VERSION 1.0 LANGUAGES C CXX)
 file(GLOB SOURCES
     "${CMAKE_SOURCE_DIR}/*.cpp"
     "${CMAKE_SOURCE_DIR}/*.c"
+    "${CMAKE_SOURCE_DIR}/*.h"
 )
 
 # Add an executable target
