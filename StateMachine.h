@@ -1,4 +1,4 @@
-// https://www.codeproject.com/Articles/1275479/State-Machine-Design-in-C
+// https://github.com/endurodave/C_StateMachine
 //
 // The StateMachine module is a C language implementation of a finite state 
 // machine (FSM).

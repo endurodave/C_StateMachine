@@ -3,6 +3,12 @@
 #include "Motor.h"
 #include "CentrifugeTest.h"
 
+// @see https://github.com/endurodave/C_StateMachine
+// 
+// Other related repos:
+// @see https://github.com/endurodave/C_StateMachineWithThreads
+// @see https://github.com/endurodave/C_Allocator
+
 // Define motor objects
 static Motor motorObj1;
 static Motor motorObj2;
