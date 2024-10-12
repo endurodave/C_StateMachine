@@ -1,6 +1,8 @@
 #include "Fault.h"
 #include "StateMachine.h"
 
+// @see https://github.com/endurodave/C_StateMachine
+
 // Generates an external event. Called once per external event 
 // to start the state machine executing
 void _SM_ExternalEvent(SM_StateMachine* self, const SM_StateMachineConst* selfConst, BYTE newState, void* pEventData)
