@@ -5,7 +5,13 @@ Originally published on CodeProject at: <a href="https://www.codeproject.com/Art
 
 Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a href="http://www.drdobbs.com/cpp/state-machine-design-in-c/184401236"><strong>State Machine Design in C++</strong></a>
 
-See related compact state machine Git project <a href="https://github.com/endurodave/StateMachine"><strong>here</strong></a>.
+Related articles:
+
+<ul>
+    <li><a href="https://github.com/endurodave/C_StateMachineWithThreads">C Language State Machine with Threads</a> - by David Lafreniere</li>
+	<li><a href="https://github.com/endurodave/C_Allocator">A Fixed Block Allocator in C</a> - by David Lafreniere</li>
+    <li><a href="https://github.com/endurodave/StateMachine">State Machine Design in C++</a> - by David Lafreniere</li>
+</ul>
 
 <h2>Introduction</h2>
 
@@ -50,6 +56,22 @@ switch (currentState) {
 <p>This method is certainly appropriate for solving many different design problems. When employed on an event driven, multithreaded project, however, state machines of this form can be quite limiting.</p>
 
 <p>The first problem revolves around controlling what state transitions are valid and which ones are invalid. There is no way to enforce the state transition rules. Any transition is allowed at any time, which is not particularly desirable. For most designs, only a few transition patterns are valid. Ideally, the software design should enforce these predefined state sequences and prevent the unwanted transitions. Another problem arises when trying to send data to a specific state. Since the entire state machine is located within a single function, sending additional data to any given state proves difficult. And lastly these designs are rarely suitable for use in a multithreaded system. The designer must ensure the state machine is called from a single thread of control.</p>
+
+<h2>Project Build</h2>
+
+<a href="https://www.cmake.org">CMake</a> is used to create the build files. CMake is free and open-source software. Windows, Linux and other toolchains are supported. Example CMake console commands executed inside the project root directory: 
+
+<h3>Windows Visual Studio</h3>
+
+<code>cmake -G "Visual Studio 17 2022" -A Win32 -B ../C_StateMachineBuild -S .</code>
+
+After executed, open the Visual Studio project from within the <code>C_StateMachineBuild</code> directory.
+
+<h3>Linux Make</h3>
+
+<code>cmake -G "Unix Makefiles" -B ../C_StateMachineBuild -S .</code>
+
+After executed, build the software from within the C_StateMachineBuild directory using the command <code>make</code>. Run the console app using <code>./C_StateMachineApp</code>.
 
 <h2>Why use a state machine?</h2>
 
@@ -735,6 +757,7 @@ GUARD_DEFINE(StartTest, NoEventData)
 <h2>References</h2>
 
 <ul>
-	<li><a href="https://www.codeproject.com/Articles/1087619/State-Machine-Design-in-Cplusplus-2">State Machine Design in C++</a> - by David Lafreniere</li>
-	<li><a href="https://www.codeproject.com/Articles/1272619/A-Fixed-Block-Memory-Allocator-in-C">A Fixed Block Allocator in C</a> - by David Lafreniere</li>
+    <li><a href="https://github.com/endurodave/C_StateMachineWithThreads">C Language State Machine with Threads</a> - by David Lafreniere</li>
+	<li><a href="https://github.com/endurodave/C_Allocator">A Fixed Block Allocator in C</a> - by David Lafreniere</li>
+    <li><a href="https://github.com/endurodave/StateMachine">State Machine Design in C++</a> - by David Lafreniere</li>
 </ul>
