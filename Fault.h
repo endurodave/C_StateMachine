@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#pragma warning(disable : 4005)  // Disable warning C4005
+
 // Used for compile-time checking for array sizes. On Windows VC++, you get 
 // an "error C2118: negative subscript" error. On GCC: size of "unnamed array is negative"
 #ifndef C_ASSERT
