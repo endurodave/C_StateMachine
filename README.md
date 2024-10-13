@@ -5,6 +5,8 @@ Originally published on CodeProject at: <a href="https://www.codeproject.com/Art
 
 Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a href="http://www.drdobbs.com/cpp/state-machine-design-in-c/184401236"><strong>State Machine Design in C++</strong></a>
 
+<p><a href="https://www.cmake.org/">CMake</a>&nbsp;is used to create the build files. CMake is free and open-source software. Windows, Linux and other toolchains are supported. See the <strong>CMakeLists.txt </strong>file for more information.</p>
+
 Related articles:
 
 <ul>
