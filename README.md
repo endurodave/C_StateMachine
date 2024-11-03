@@ -1,13 +1,49 @@
 # State Machine Design in C
 A compact C finite state machine (FSM) implementation that's easy to use on embedded and PC-based systems.
 
+# Table of Contents
+
+- [State Machine Design in C](#state-machine-design-in-c)
+- [Table of Contents](#table-of-contents)
+- [Preface](#preface)
+  - [Related repositories](#related-repositories)
+- [Introduction](#introduction)
+  - [Background](#background)
+- [Project Build](#project-build)
+  - [Windows Visual Studio](#windows-visual-studio)
+  - [Linux Make](#linux-make)
+- [Why use a state machine?](#why-use-a-state-machine)
+- [State machine design](#state-machine-design)
+  - [Internal and external events](#internal-and-external-events)
+  - [Event data](#event-data)
+  - [State transitions](#state-transitions)
+- [StateMachine module](#statemachine-module)
+- [Motor example](#motor-example)
+  - [External events](#external-events)
+  - [State enumerations](#state-enumerations)
+  - [State functions](#state-functions)
+  - [State map](#state-map)
+  - [State machine objects](#state-machine-objects)
+  - [Transition map](#transition-map)
+  - [New state machine steps](#new-state-machine-steps)
+- [State engine](#state-engine)
+- [Generating events](#generating-events)
+- [No heap usage](#no-heap-usage)
+- [CentrifugeTest example](#centrifugetest-example)
+- [Multithread safety](#multithread-safety)
+- [Conclusion](#conclusion)
+- [References](#references)
+
+
+# Preface
+
 Originally published on CodeProject at: <a href="https://www.codeproject.com/Articles/1275479/State-Machine-Design-in-C"><strong>State Machine Design in C</strong></a>
 
 Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a href="http://www.drdobbs.com/cpp/state-machine-design-in-c/184401236"><strong>State Machine Design in C++</strong></a>
 
 <p><a href="https://www.cmake.org/">CMake</a>&nbsp;is used to create the build files. CMake is free and open-source software. Windows, Linux and other toolchains are supported. See the <strong>CMakeLists.txt </strong>file for more information.</p>
 
-Related articles:
+## Related repositories
 
 <ul>
     <li><a href="https://github.com/endurodave/C_StateMachineWithThreads">C Language State Machine with Threads</a> - by David Lafreniere</li>
@@ -15,7 +51,7 @@ Related articles:
     <li><a href="https://github.com/endurodave/StateMachine">State Machine Design in C++</a> - by David Lafreniere</li>
 </ul>
 
-<h2>Introduction</h2>
+# Introduction
 
 <p>In 2000, I wrote an article entitled &quot;<em>State Machine Design in C++</em>&quot; for C/C++ Users Journal (R.I.P.). Interestingly, that old article is still available and (at the time of writing this article) the #1 hit on Google when searching for C++ state machine. The article was written over 15 years ago, but I continue to use the basic idea on numerous projects. It&#39;s compact, easy to understand and, in most cases, has just enough features to accomplish what I need.</p>
 
@@ -36,7 +72,7 @@ Related articles:
 
 <p>The article is not a tutorial on the best design decomposition practices for software state machines. I&#39;ll be focusing on state machine code and simple examples with just enough complexity to facilitate understanding the features and usage.</p>
 
-<h2>Background</h2>
+## Background
 
 <p>A common design technique in the repertoire of most programmers is the venerable finite state machine (FSM). Designers use this programming construct to break complex problems into manageable states and state transitions. There are innumerable ways to implement a state machine.</p>
 
@@ -59,23 +95,23 @@ switch (currentState) {
 
 <p>The first problem revolves around controlling what state transitions are valid and which ones are invalid. There is no way to enforce the state transition rules. Any transition is allowed at any time, which is not particularly desirable. For most designs, only a few transition patterns are valid. Ideally, the software design should enforce these predefined state sequences and prevent the unwanted transitions. Another problem arises when trying to send data to a specific state. Since the entire state machine is located within a single function, sending additional data to any given state proves difficult. And lastly these designs are rarely suitable for use in a multithreaded system. The designer must ensure the state machine is called from a single thread of control.</p>
 
-<h2>Project Build</h2>
+# Project Build
 
 <a href="https://www.cmake.org">CMake</a> is used to create the build files. CMake is free and open-source software. Windows, Linux and other toolchains are supported. Example CMake console commands executed inside the project root directory: 
 
-<h3>Windows Visual Studio</h3>
+## Windows Visual Studio
 
 <code>cmake -G "Visual Studio 17 2022" -A Win32 -B ../C_StateMachineBuild -S .</code>
 
 After executed, open the Visual Studio project from within the <code>C_StateMachineBuild</code> directory.
 
-<h3>Linux Make</h3>
+## Linux Make
 
 <code>cmake -G "Unix Makefiles" -B ../C_StateMachineBuild -S .</code>
 
 After executed, build the software from within the C_StateMachineBuild directory using the command <code>make</code>. Run the console app using <code>./C_StateMachineApp</code>.
 
-<h2>Why use a state machine?</h2>
+# Why use a state machine?
 
 <p>Implementing code using a state machine is an extremely handy design technique for solving complex engineering problems. State machines break down the design into a series of steps, or what are called states in state-machine lingo. Each state performs some narrowly defined task. Events, on the other hand, are the stimuli, which cause the state machine to move, or transition, between states.</p>
 
@@ -138,7 +174,9 @@ After executed, build the software from within the C_StateMachineBuild directory
 
 <p>In short, using a state machine captures and enforces complex interactions, which might otherwise be difficult to convey and implement.</p>
 
-<h2>Internal and external events</h2>
+# State machine design
+
+## Internal and external events
 
 <p>As I mentioned earlier, an event is the stimulus that causes a state machine to transition between states. For instance, a button press could be an event. Events can be broken out into two categories: external and internal. The external event, at its most basic level, is a function call into a state-machine module. These functions are public and are called from the outside or from code external to the state-machine object. Any thread or task within a system can generate an external event. If the external event function call causes a state transition to occur, the state will execute synchronously within the caller&#39;s thread of control. An internal event, on the other hand, is self-generated by the state machine itself during state execution.</p>
 
@@ -146,19 +184,19 @@ After executed, build the software from within the C_StateMachineBuild directory
 
 <p>Once the external event starts the state machine executing, it cannot be interrupted by another external event until the external event and all internal events have completed execution if locks are used. This run to completion model provides a multithread-safe environment for the state transitions. Semaphores or mutexes can be used in the state machine engine to block other threads that might be trying to be simultaneously access the same state machine instance. See source code function <code>_SM_ExternalEvent()</code> comments for where the locks go.</p>
 
-<h2>Event data</h2>
+## Event data
 
 <p>When an event is generated, it can optionally attach event data to be used by the state function during execution. Event data is a single <code>const</code> or non-<code>const </code>pointer to any built-in or user-defined data type.</p>
 
 <p>Once the state has completed execution, the event data is considered used up and must be deleted. Therefore, any event data sent to a state machine must be dynamically created via <code>SM_XAlloc()</code>. &nbsp;The state machine engine automatically frees allocated event data using <code>SM_XFree()</code>.</p>
 
-<h2>State transitions</h2>
+## State transitions
 
 <p>When an external event is generated, a lookup is performed to determine the state transition course of action. There are three possible outcomes to an event: new state, event ignored, or cannot happen. A new state causes a transition to a new state where it is allowed to execute. Transitions to the existing state are also possible, which means the current state is re-executed. For an ignored event, no state executes. However, the event data, if any, is deleted. The last possibility, cannot happen, is reserved for situations where the event is not valid given the current state of the state machine. If this occurs, the software faults.</p>
 
 <p>In this implementation, internal events are not required to perform a validating transition lookup. The state transition is assumed to be valid. You could check for both valid internal and external event transitions, but in practice, this just takes more storage space and generates busywork for very little benefit. The real need for validating transitions lies in the asynchronous, external events where a client can cause an event to occur at an inappropriate time. Once the state machine is executing, it cannot be interrupted. It is under the control of the private implementation, thereby making transition checks unnecessary. This gives the designer the freedom to change states, via internal events, without the burden of updating transition tables.</p>
 
-<h2>StateMachine module</h2>
+# StateMachine module
 
 <p>The state machine source code is contained within the <strong>StateMachine.c</strong> and <strong>StateMachine.h</strong> files. The code below shows the partial header. The <strong><code>StateMachine</code> </strong>header contains various preprocessor multiline macros to ease implementation of a state machine.</p>
 
@@ -246,7 +284,7 @@ void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfCo
 
 <p><code>SM_DECLARE </code>and <code>SM_DEFINE</code> are used to create a state machine instance. <code>EVENT_DECLARE</code> and <code>EVENT_DEFINE</code> create external event functions. And finally, <code>STATE_DECLARE</code> and <code>STATE_DEFINE</code> create state functions.</p>
 
-<h2>Motor example</h2>
+# Motor example
 
 <p><code>Motor </code>implements our hypothetical motor-control state machine, where clients can start the motor, at a specific speed, and stop the motor. The <code>Motor</code> header interface is shown below:</p>
 
@@ -323,15 +361,15 @@ EVENT_DEFINE(MTR_Halt, NoEventData)
     END_TRANSITION_MAP(Motor, pEventData)
 }</pre>
 
-<h3>External events</h3>
+## External events
 
 <p><code>MTR_SetSpeed </code>and <code>MTR_Halt</code> are considered external events into the <code>Motor</code> state machine. <code>MTR_SetSpeed </code>takes a pointer to <code>MotorData</code> event data, containing the motor speed. This data structure will be freed using <code>SM_XFree()</code> upon completion of the state processing, so it is imperative that it be created using <code>SM_XAlloc()</code> before the function call is made.</p>
 
-<h3>State enumerations</h3>
+## State enumerations
 
 <p>Each state function must have an enumeration associated with it. These enumerations are used to store the current state of the state machine. In <code>Motor</code>, <code>States</code> provides these enumerations, which are used later for indexing into the transition map and state map lookup tables.</p>
 
-<h3>State functions</h3>
+## State functions
 
 <p>State functions implement each state &mdash; one state function per state-machine state. <code>STATE_DECLARE </code>is used to declare the state function interface and <code>STATE_DEFINE </code>defines the implementation.</p>
 
@@ -424,7 +462,7 @@ void ST_Stop(SM_StateMachine* self, void* pEventData)</pre>
 
 <p><code>SM_GuardFunc </code>and <code>SM_Entry </code>function <code>typedef</code>&rsquo;s also accept event data. <code>SM_ExitFunc </code>is unique in that no event data is allowed.</p>
 
-<h3>State map</h3>
+## State map
 
 <p>The state-machine engine knows which state function to call by using the state map. The state map maps the <code>currentState</code> variable to a specific state function. For instance, if <code>currentState </code>is 2, then the third state-map function pointer entry will be called (counting from zero). The state map table is created using these three macros:</p>
 
@@ -470,7 +508,7 @@ END_STATE_MAP_EX(CentrifugeTest)</pre>
 
 <p>Don&rsquo;t forget to add the prepended characters (ST_, GD_, EN_ or EX_) for each function.</p>
 
-<h3>State machine objects</h3>
+## State machine objects
 
 <p>In C++, objects are integral to the language. Using C, you have to work a bit harder to accomplish similar behavior. This C language state machine supports multiple state machine objects (or instances) instead of having&nbsp;a single, static state machine implementation.</p>
 
@@ -502,7 +540,7 @@ Motor* pInstance = SM_GetInstance(Motor);
 pInstance-&gt;currentSpeed = pEventData-&gt;speed;
 </pre>
 
-<h3>Transition map</h3>
+## Transition map
 
 <p>The last detail to attend to are the state transition rules. How does the state machine know what transitions should occur? The answer is the transition map. A transition map is lookup table that maps the <code>currentState </code>variable to a state enum constant. Every external event function has a transition map table created with three macros:</p>
 
@@ -549,7 +587,7 @@ TRANSITION_MAP_ENTRY (ST_STOP)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <
 
 <p>The <code>C_ASSERT()</code> macro is used within <code>END_TRANSITION_MAP</code>. If there is a mismatch between the number of state machine states and the number of transition map entries, a compile time error is generated.</p>
 
-<h3>New state machine steps</h3>
+## New state machine steps
 
 <p>Creating a new state machine requires a few basic high-level steps:</p>
 
@@ -561,7 +599,7 @@ TRANSITION_MAP_ENTRY (ST_STOP)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <
 	<li>Create one transition map lookup table for each external event function using the <code>TRANSITION_MAP </code>macros.</li>
 </ol>
 
-<h2>State engine</h2>
+# State engine
 
 <p>The state engine executes the state functions based upon events generated. The transition map is an array of <code>SM_StateStruct</code> instances indexed by the <code>currentState </code>variable. When the <code>_SM_StateEngine()</code> function executes, it looks up the correct state function within the <code>SM_StateStruct </code>array. After the state function has a chance to execute, it frees the event data, if any, before checking to see if any internal events were generated via <code>SM_InternalEvent()</code>.</p>
 
@@ -619,7 +657,7 @@ void _SM_StateEngine(SM_StateMachine* self, SM_StateMachineConst* selfConst)
 	<li>Call the state action function for the new state. The new state is now the current state.</li>
 </ol>
 
-<h2>Generating events</h2>
+# Generating events
 
 <p>At this point, we have a working state machine. Let&#39;s see how to generate events to it. An external event is generated by dynamically creating the event data structure using <code>SM_XAlloc()</code>, assigning the structure member variables, and calling the external event function using the <code>SM_Event()</code> macro. The following code fragment shows how a synchronous call is made.</p>
 
@@ -650,11 +688,11 @@ data-&gt;speed = 100;
 SM_InternalEvent(ST_CHANGE_SPEED, data);
 </pre>
 
-<h2>No heap usage</h2>
+# No heap usage
 
 <p>All state machine event data must be dynamically created. However, on some systems using the heap is undesirable. The included <code>x_allocator</code> module is a fixed block memory allocator that eliminates heap usage. Define <code>USE_SM_ALLOCATOR </code>within <strong>StateMachine.c</strong> to use the fixed block allocator. See the <strong>References</strong> section below for&nbsp;<code>x_allocator</code> information.</p>
 
-<h2>CentrifugeTest example</h2>
+# CentrifugeTest example
 
 <p>The <code>CentrifugeTest </code>example shows how an extended state machine is created using guard, entry and exit actions. The state diagram is shown below.</p>
 
@@ -741,7 +779,7 @@ GUARD_DEFINE(StartTest, NoEventData)
 }
 </pre>
 
-<h2>Multithread safety</h2>
+# Multithread safety    
 
 <p>To prevent preemption by another thread when the state machine is in the process of execution, the <code>StateMachine </code>module can use locks within the <code>_SM_ExternalEvent()</code>&nbsp;function. Before the external event is allowed to execute, a semaphore can be locked. When the external event and all internal events have been processed, the software lock is released, allowing another external event to enter the state machine instance.</p>
 
@@ -750,13 +788,13 @@ GUARD_DEFINE(StartTest, NoEventData)
 <ul>
 </ul>
 
-<h2>Conclusion</h2>
+# Conclusion
 
 <p>Implementing a state machine using this method as opposed to the old switch statement style may seem like extra effort. However, the payoff is in a more robust design that is capable of being employed uniformly over an entire multithreaded system. Having each state in its own function provides easier reading than a single huge <code>switch</code> statement, and allows unique event data to be sent to each state. In addition, validating state transitions prevents client misuse by eliminating the side effects caused by unwanted state transitions.</p>
 
 <p>This C language version is a close translation of the&nbsp;C++ implementation I&rsquo;ve used for many years on different projects. Consider the C++ implementation within the <strong>References </strong>section if using C++.</p>
 
-<h2>References</h2>
+# References
 
 <ul>
     <li><a href="https://github.com/endurodave/C_StateMachineWithThreads">C Language State Machine with Threads</a> - by David Lafreniere</li>
