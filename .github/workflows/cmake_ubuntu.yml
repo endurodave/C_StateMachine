@@ -1,0 +1,26 @@
+name: Ubuntu
+
+on:
+  push:
+    branches:
+      - master  # Trigger on push to 'master' branch
+  pull_request:
+    branches:
+      - master  # Trigger on pull request targeting 'master' branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use Ubuntu environment for the build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Checkout the repository code
+
+    - name: Configure CMake
+      run: cmake -S . -B Build  # Configure CMake to generate build files in 'Build' directory
+
+    - name: Build
+      run: cmake --build Build  # Build the project using CMake
+
+    - name: Run C_StateMachineApp
+      run: ./Build/C_StateMachineApp  # Run the built executable

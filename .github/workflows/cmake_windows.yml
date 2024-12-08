@@ -1,0 +1,29 @@
+name: Windows
+
+on:
+  push:
+    branches:
+      - master  # Trigger on push to 'main' branch
+  pull_request:
+    branches:
+      - master  # Trigger on pull request targeting 'main' branch
+
+jobs:
+  build:
+    runs-on: windows-latest  # Use Windows environment for the build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Checkout the repository code
+
+    - name: Set up Visual Studio
+      uses: microsoft/setup-msbuild@v1.1  # Set up Visual Studio environment (MSBuild)
+
+    - name: Configure CMake
+      run: cmake -S . -B Build -G "Visual Studio 17 2022" -A Win32 # Configure CMake for Visual Studio
+
+    - name: Build
+      run: cmake --build Build --config Release  # Build the project using CMake with Release configuration
+
+    - name: Run C_StateMachineApp
+      run: .\Build\Release\C_StateMachineApp.exe  # Run the built executable (adjust path for MSBuild)

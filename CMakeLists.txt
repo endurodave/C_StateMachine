@@ -1,10 +1,10 @@
 # Example CMake command line to create project build files:
 #
 # *** Windows ***
-# cmake -G "Visual Studio 17 2022" -A Win32 -B ../C_StateMachineBuild -S .
+# cmake -G "Visual Studio 17 2022" -A Win32 -B Build -S .
 #
 # *** Linux ***
-# cmake -G "Unix Makefiles" -B ../C_StateMachineBuild -S .
+# cmake -G "Unix Makefiles" -B Build -S .
 
 # Specify the minimum CMake version required
 cmake_minimum_required(VERSION 3.10)
