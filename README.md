@@ -107,15 +107,15 @@ switch (currentState) {
 
 ## Windows Visual Studio
 
-<code>cmake -G "Visual Studio 17 2022" -A Win32 -B ../C_StateMachineBuild -S .</code>
+<code>cmake -G "Visual Studio 17 2022" -A Win32 -B Build -S .</code>
 
-After executed, open the Visual Studio project from within the <code>C_StateMachineBuild</code> directory.
+After executed, open the Visual Studio project from within the <code>Build</code> directory.
 
 ## Linux Make
 
-<code>cmake -G "Unix Makefiles" -B ../C_StateMachineBuild -S .</code>
+<code>cmake -G "Unix Makefiles" -B Build -S .</code>
 
-After executed, build the software from within the C_StateMachineBuild directory using the command <code>make</code>. Run the console app using <code>./C_StateMachineApp</code>.
+After executed, build the software from within the Build directory using the command <code>make</code>. Run the console app using <code>./C_StateMachineApp</code>.
 
 # Why use a state machine?
 
