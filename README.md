@@ -37,7 +37,6 @@ A compact C finite state machine (FSM) implementation that's easy to use on embe
 - [No heap usage](#no-heap-usage)
 - [CentrifugeTest example](#centrifugetest-example)
 - [Multithread safety](#multithread-safety)
-- [Star History](#star-history)
 - [Conclusion](#conclusion)
 - [References](#references)
 
@@ -793,12 +792,6 @@ GUARD_DEFINE(StartTest, NoEventData)
 
 <ul>
 </ul>
-
-# Star History
-
-Find this repository useful? Consider giving it a star!
-
-[![Star History Chart](https://api.star-history.com/svg?repos=endurodave/C_StateMachine&type=Date)](https://star-history.com/#endurodave/C_StateMachine&Date)
 
 # Conclusion
 
