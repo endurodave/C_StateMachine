@@ -16,7 +16,6 @@ A compact C finite state machine (FSM) implementation that's easy to use on embe
 - [Getting Started](#getting-started)
 - [Introduction](#introduction)
   - [Background](#background)
-- [Getting Started](#getting-started-1)
 - [Why use a state machine?](#why-use-a-state-machine)
 - [State machine design](#state-machine-design)
   - [Internal and external events](#internal-and-external-events)
@@ -47,14 +46,15 @@ Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a hr
 
 ## Related repositories
 
-<ul>
-    <li><a href="https://github.com/endurodave/C_StateMachineWithThreads">C Language State Machine with Threads</a> - A C language state machine with OS threads.</li>
-	<li><a href="https://github.com/endurodave/C_Allocator">A Fixed Block Allocator in C</a> - A C language fixed block memory allocator.</li>
-    <li><a href="https://github.com/endurodave/StateMachine">State Machine Design in C++</a> - A C++ finite state machine (FSM) implementation.</li>
-    <li><a href="https://github.com/endurodave/StateMachineWithThreads">C++ State Machine with Threads</a> - A C++ state machine integrated with an asynchronous callback library.</li>
-	<li><a href="https://github.com/endurodave/StateMachineWithModernDelegates">C++ State Machine with Delegates</a> - A C++ state machine integrated with the <a href="https://github.com/endurodave/DelegateMQ">DelegateMQ</a> asynchronous delegate library.</li>
-    <li><a href="https://github.com/endurodave/AsyncStateMachine">Asynchronous State Machine in C++</a> - An asynchronous C++ state machine integrated with the <a href="https://github.com/endurodave/DelegateMQ">DelegateMQ</a> asynchronous delegate library.</li>
-</ul>
+The following table provides a list of related projects, including various state machine implementations in C and C++.
+
+| Project | Description |
+| :--- | :--- |
+| [**C Language State Machine with Threads**](https://github.com/endurodave/C_StateMachineWithThreads) | A C language state machine with OS threads. |
+| [**State Machine Design in C++**](https://github.com/endurodave/StateMachine) | A C++ finite state machine (FSM) implementation. |
+| [**C++ State Machine with Threads**](https://github.com/endurodave/StateMachineWithThreads) | A C++ state machine integrated with an asynchronous callback library. |
+| [**C++ State Machine with Signals**](https://github.com/endurodave/cpp-signal-slot-fsm) | A thread-safe C++ state machine demonstrating **Signal-Slot communication** and RAII-managed asynchronous event marshaling via DelegateMQ. |
+| [**Asynchronous State Machine in C++**](https://github.com/endurodave/AsyncStateMachine) | A **native asynchronous state machine** implemented as an active object, where every transition is dispatched and executed within its own thread of control. |
 
 # Getting Started
 
@@ -108,15 +108,6 @@ switch (currentState) {
 <p>This method is certainly appropriate for solving many different design problems. When employed on an event driven, multithreaded project, however, state machines of this form can be quite limiting.</p>
 
 <p>The first problem revolves around controlling what state transitions are valid and which ones are invalid. There is no way to enforce the state transition rules. Any transition is allowed at any time, which is not particularly desirable. For most designs, only a few transition patterns are valid. Ideally, the software design should enforce these predefined state sequences and prevent the unwanted transitions. Another problem arises when trying to send data to a specific state. Since the entire state machine is located within a single function, sending additional data to any given state proves difficult. And lastly these designs are rarely suitable for use in a multithreaded system. The designer must ensure the state machine is called from a single thread of control.</p>
-
-# Getting Started
-
-[CMake](https://cmake.org/) is used to create the project build files on any Windows or Linux machine. The state machine source code works on any C compiler on any platform.
-
-1. Clone the repository.
-2. From the repository root, run the following CMake command:   
-   `cmake -B Build .`
-3. Build and run the project within the `Build` directory. 
 
 # Why use a state machine?
 
