@@ -49,12 +49,11 @@ Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a hr
 The following table provides a list of related projects, including various state machine implementations in C and C++.
 
 | Project | Description |
-| :--- | :--- |
-| [**C Language State Machine with Threads**](https://github.com/endurodave/C_StateMachineWithThreads) | A C language state machine with OS threads. |
-| [**State Machine Design in C++**](https://github.com/endurodave/StateMachine) | A C++ finite state machine (FSM) implementation. |
-| [**C++ State Machine with Threads**](https://github.com/endurodave/StateMachineWithThreads) | A C++ state machine integrated with an asynchronous callback library. |
-| [**C++ State Machine with Signals**](https://github.com/endurodave/cpp-signal-slot-fsm) | A thread-safe C++ state machine demonstrating **Signal-Slot communication** and RAII-managed asynchronous event marshaling via DelegateMQ. |
-| [**Asynchronous State Machine in C++**](https://github.com/endurodave/AsyncStateMachine) | A **native asynchronous state machine** implemented as an active object, where every transition is dispatched and executed within its own thread of control. |
+  | :--- | :--- |
+  | [**C Language State Machine with Threads**](https://github.com/endurodave/C_StateMachineWithThreads) | A C language state machine with OS threads. |
+  | [**State Machine Design in C++**](https://github.com/endurodave/StateMachine) | A C++ finite state machine (FSM) implementation. |
+  | [**Delegate FSM**](https://github.com/endurodave/delegate-fsm) | A modern C++ state machine using delegates for state registration and async active-object dispatch. |
+
 
 # Getting Started
 
