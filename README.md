@@ -46,14 +46,13 @@ Based on original design published in C\C++ Users Journal (Dr. Dobb's) at: <a hr
 
 ## Related repositories
 
-The following table provides a list of related projects, including various state machine implementations in C and C++.
+The following table provides a list of related state machine implementations in C and C++.
 
 | Project | Description |
   | :--- | :--- |
+  | [**Async FSM**](https://github.com/endurodave/async-fsm) | A compact async C++ finite state machine providing RAII-safe asynchronous dispatch and pub/sub signals. |
   | [**C Language State Machine with Threads**](https://github.com/endurodave/C_StateMachineWithThreads) | A C language state machine with OS threads. |
   | [**State Machine Design in C++**](https://github.com/endurodave/StateMachine) | A C++ finite state machine (FSM) implementation. |
-  | [**Delegate FSM**](https://github.com/endurodave/delegate-fsm) | A modern C++ state machine using delegates for state registration and async active-object dispatch. |
-
 
 # Getting Started
 
