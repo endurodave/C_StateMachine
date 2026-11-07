@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # Checkout the repository code
+      uses: actions/checkout@v7  # Checkout the repository code
 
     - name: Configure CMake with Clang
       run: cmake -S . -B Build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++  # Configure CMake with Clang as the compiler

@@ -10,17 +10,14 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Use Windows environment for the build
+    runs-on: windows-2022  # Pinned: windows-latest no longer has Visual Studio 2022
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # Checkout the repository code
-
-    - name: Set up Visual Studio
-      uses: microsoft/setup-msbuild@v1.1  # Set up Visual Studio environment (MSBuild)
+      uses: actions/checkout@v7  # Checkout the repository code
 
     - name: Configure CMake
-      run: cmake -S . -B Build -G "Visual Studio 17 2022" -A Win32 # Configure CMake for Visual Studio
+      run: cmake -S . -B Build -A Win32  # Default generator: the installed Visual Studio
 
     - name: Build
       run: cmake --build Build --config Release  # Build the project using CMake with Release configuration
