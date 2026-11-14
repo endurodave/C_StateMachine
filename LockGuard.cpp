@@ -1,4 +1,7 @@
 #include "LockGuard.h"
+
+#ifndef SM_NO_LOCKS
+
 #include "Fault.h"
 #include <mutex>
 
@@ -44,3 +47,4 @@ void LK_Unlock(LOCK_HANDLE hLock)
     lock->unlock();
 }
 
+#endif // SM_NO_LOCKS

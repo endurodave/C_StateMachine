@@ -1,0 +1,21 @@
+{
+  "name": "C_StateMachine",
+  "version": "1.1.0",
+  "description": "Compact C finite state machine for embedded systems. Table-driven, guard/entry/exit actions, typed event data, optional fixed-block allocator (no heap).",
+  "keywords": ["state machine", "fsm", "embedded", "c", "fixed block allocator", "event driven"],
+  "repository": { "type": "git", "url": "https://github.com/endurodave/C_StateMachine.git" },
+  "authors": [{ "name": "David Lafreniere", "url": "https://github.com/endurodave", "maintainer": true }],
+  "license": "MIT",
+  "homepage": "https://github.com/endurodave/C_StateMachine",
+  "frameworks": "*",
+  "platforms": "*",
+  "headers": "StateMachine.h",
+  "export": {
+    "include": ["StateMachine.c", "StateMachine.h", "sm_allocator.c", "sm_allocator.h", "x_allocator.c", "x_allocator.h", "fb_allocator.c", "fb_allocator.h", "LockGuard.cpp", "LockGuard.h", "Fault.cpp", "Fault.h", "DataTypes.h", "LICENSE", "README.md", "library.json"]
+  },
+  "build": {
+    "srcDir": ".",
+    "includeDir": ".",
+    "srcFilter": ["-<*>", "+<StateMachine.c>", "+<sm_allocator.c>", "+<x_allocator.c>", "+<fb_allocator.c>", "+<LockGuard.cpp>", "+<Fault.cpp>"]
+  }
+}

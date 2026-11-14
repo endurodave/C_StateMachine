@@ -3,6 +3,24 @@
 
 #include "DataTypes.h"
 
+// The default lock uses std::mutex (LockGuard.cpp). Define SM_NO_LOCKS to
+// build without locks: single-threaded use, or a toolchain without std::mutex.
+// It is defined automatically for AVR, whose toolchain has no <mutex>.
+#if defined(__AVR__) && !defined(SM_NO_LOCKS)
+#define SM_NO_LOCKS
+#endif
+
+#ifdef SM_NO_LOCKS
+
+typedef int LOCK_HANDLE;
+
+#define LK_CREATE()     (1)
+#define LK_DESTROY(h)
+#define LK_LOCK(h)
+#define LK_UNLOCK(h)
+
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -22,5 +40,7 @@ void LK_Unlock(LOCK_HANDLE hLock);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // SM_NO_LOCKS
 
 #endif 

@@ -1,7 +1,7 @@
-![License MIT](https://img.shields.io/github/license/BehaviorTree/BehaviorTree.CPP?color=blue)
-[![conan Ubuntu](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml)
-[![conan Ubuntu](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml)
-[![conan Windows](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml)
+![License MIT](https://img.shields.io/github/license/endurodave/C_StateMachine?color=blue)
+[![Ubuntu](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml)
+[![Clang](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml)
+[![Windows](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml)
 
 # State Machine Design in C
 
@@ -62,6 +62,8 @@ Related repositories containing alternative state machine implementations.
 2. From the repository root, run the following CMake command:   
    `cmake -B Build .`
 3. Build and run the project within the `Build` directory. 
+
+**PlatformIO:** add `lib_deps = C_StateMachine` to `platformio.ini`. The library builds the state machine, fixed-block allocator and lock files; the Motor and Centrifuge demos aren't included. The allocator lock uses `std::mutex`; define `SM_NO_LOCKS` (`build_flags = -DSM_NO_LOCKS`) for single-threaded use or a toolchain without `std::mutex`. It's defined automatically on AVR.
 
 # Introduction
 
@@ -162,7 +164,7 @@ switch (currentState) {
 
 <p>To graphically illustrate the states and events, we use a state diagram. Figure 1 below shows the state transitions for the motor control module. A box denotes a state and a connecting arrow indicates the event transitions. Arrows with the event name listed are external events, whereas unadorned lines are considered internal events. (I cover the differences between internal and external events later in the article.)</p>
 
-<p><img alt="" src="Motor.png" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/endurodave/C_StateMachine/master/Motor.png" /></p>
 
 <div class="Caption">Figure 1: Motor state diagram</div>
 
@@ -692,7 +694,7 @@ SM_InternalEvent(ST_CHANGE_SPEED, data);
 
 <p>The <code>CentrifugeTest </code>example shows how an extended state machine is created using guard, entry and exit actions. The state diagram is shown below.</p>
 
-<p><img alt="" src="CentrifugeTest.png" style="height: 736px; width: 500px" /></p>
+<p><img alt="" src="https://raw.githubusercontent.com/endurodave/C_StateMachine/master/CentrifugeTest.png" style="height: 736px; width: 500px" /></p>
 
 <div class="Caption">Figure 2: CentrifugeTest state diagram</div>
 
