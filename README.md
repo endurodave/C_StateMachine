@@ -3,6 +3,7 @@
 [![Clang](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml)
 [![Windows](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml)
 [![PlatformIO](https://github.com/endurodave/C_StateMachine/actions/workflows/platformio.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/platformio.yml)
+[![Arduino](https://github.com/endurodave/C_StateMachine/actions/workflows/arduino.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/arduino.yml)
 
 # State Machine Design in C
 
@@ -15,6 +16,7 @@ A compact C finite state machine (FSM) implementation that's easy to use on embe
 - [Preface](https://github.com/endurodave/C_StateMachine#preface)
   - [Related repositories](https://github.com/endurodave/C_StateMachine#related-repositories)
 - [Getting Started](https://github.com/endurodave/C_StateMachine#getting-started)
+  - [Arduino](https://github.com/endurodave/C_StateMachine#arduino)
   - [PlatformIO](https://github.com/endurodave/C_StateMachine#platformio)
 - [Introduction](https://github.com/endurodave/C_StateMachine#introduction)
   - [Background](https://github.com/endurodave/C_StateMachine#background)
@@ -65,17 +67,21 @@ Related repositories containing alternative state machine implementations.
    `cmake -B Build .`
 3. Build and run the project within the `Build` directory. 
 
-The CMake build uses the copy of [C_Allocator](https://github.com/endurodave/C_Allocator) in the `allocator` folder for the fixed block allocator.
+The library is the `src` folder (`StateMachine.c`/`.h` and the `sm_allocator` glue). The desktop demo's Motor and CentrifugeTest state machines are in `examples/desktop`, and the CMake build uses the copy of [C_Allocator](https://github.com/endurodave/C_Allocator) in the `allocator` folder for the fixed block allocator.
+
+## Arduino
+
+`C_StateMachine` is an Arduino library. In the Arduino IDE, install **C_StateMachine** from the Library Manager (Sketch &rarr; Include Library &rarr; Manage Libraries); it installs [C_Allocator](https://github.com/endurodave/C_Allocator) with it. Then `#include <C_StateMachine.h>`, call `ALLOC_Init()` once in `setup()`, and see File &rarr; Examples &rarr; C_StateMachine &rarr; C_StateMachine_Demo, the Motor state machine below. The demo fits an Uno (about 1.5 KB of RAM).
 
 ## PlatformIO
 
 `C_StateMachine` is in the [PlatformIO registry](https://registry.platformio.org/libraries/endurodave/C_StateMachine). Add it to your project's `platformio.ini`:
 
 ```ini
-lib_deps = endurodave/C_StateMachine@^1.2.0
+lib_deps = endurodave/C_StateMachine@^1.3.0
 ```
 
-PlatformIO installs [C_Allocator](https://github.com/endurodave/C_Allocator) with it; event data comes from C_Allocator's fixed block pools (see [No heap usage](https://github.com/endurodave/C_StateMachine#no-heap-usage)). `#include "StateMachine.h"`, and call `ALLOC_Init()` (from `"fb_allocator.h"`) once at startup, before the first event. The package contains the state machine and allocator glue only; the Motor and CentrifugeTest state machines in the repository root aren't included.
+PlatformIO installs [C_Allocator](https://github.com/endurodave/C_Allocator) with it; event data comes from C_Allocator's fixed block pools (see [No heap usage](https://github.com/endurodave/C_StateMachine#no-heap-usage)). `#include "C_StateMachine.h"` (or `"StateMachine.h"`), and call `ALLOC_Init()` (from `"fb_allocator.h"`) once at startup, before the first event. The package contains the state machine and allocator glue only; the desktop demo's Motor and CentrifugeTest state machines aren't included.
 
 The allocator locks with `std::mutex` where the toolchain has it (ESP32, desktop) and uses no lock on bare-metal STM32, RP2040 and AVR. On an RTOS, add C_Allocator's lock option for your OS, e.g. `build_flags = -DALLOC_LOCK_FREERTOS`; see C_Allocator's [Thread Safety](https://github.com/endurodave/C_Allocator#thread-safety). `-DSM_NO_LOCKS` still selects no lock.
 

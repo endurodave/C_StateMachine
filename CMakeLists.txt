@@ -12,13 +12,15 @@ cmake_minimum_required(VERSION 3.10)
 # Project name and language (C or C++)
 project(C_StateMachine VERSION 1.0 LANGUAGES C CXX)
 
-# Collect all source files in the current directory
 file(GLOB SOURCES
-    "${CMAKE_SOURCE_DIR}/*.cpp"
-    "${CMAKE_SOURCE_DIR}/*.c"
-    "${CMAKE_SOURCE_DIR}/*.h"
+    # The library (the Arduino library layout: src/)
+    "${CMAKE_SOURCE_DIR}/src/*.c"
+    "${CMAKE_SOURCE_DIR}/src/*.h"
+    # The desktop demo: Motor and CentrifugeTest state machines
+    "${CMAKE_SOURCE_DIR}/examples/desktop/*.c"
+    "${CMAKE_SOURCE_DIR}/examples/desktop/*.h"
     # Copy of C_Allocator (https://github.com/endurodave/C_Allocator) for this
-    # build. The PlatformIO package depends on endurodave/C_Allocator instead.
+    # build. The PlatformIO and Arduino packages depend on C_Allocator instead.
     "${CMAKE_SOURCE_DIR}/allocator/*.cpp"
     "${CMAKE_SOURCE_DIR}/allocator/*.c"
     "${CMAKE_SOURCE_DIR}/allocator/*.h"
@@ -26,7 +28,7 @@ file(GLOB SOURCES
 
 # Add an executable target
 add_executable(C_StateMachineApp ${SOURCES})
-target_include_directories(C_StateMachineApp PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/allocator)
-
-
-
+target_include_directories(C_StateMachineApp PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/examples/desktop
+    ${CMAKE_SOURCE_DIR}/allocator)
