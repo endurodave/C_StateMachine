@@ -2,6 +2,7 @@
 [![Ubuntu](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_ubuntu.yml)
 [![Clang](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_clang.yml)
 [![Windows](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/cmake_windows.yml)
+[![PlatformIO](https://github.com/endurodave/C_StateMachine/actions/workflows/platformio.yml/badge.svg)](https://github.com/endurodave/C_StateMachine/actions/workflows/platformio.yml)
 
 # State Machine Design in C
 
@@ -9,34 +10,35 @@ A compact C finite state machine (FSM) implementation that's easy to use on embe
 
 # Table of Contents
 
-- [State Machine Design in C](#state-machine-design-in-c)
-- [Table of Contents](#table-of-contents)
-- [Preface](#preface)
-  - [Related repositories](#related-repositories)
-- [Getting Started](#getting-started)
-- [Introduction](#introduction)
-  - [Background](#background)
-- [Why use a state machine?](#why-use-a-state-machine)
-- [State machine design](#state-machine-design)
-  - [Internal and external events](#internal-and-external-events)
-  - [Event data](#event-data)
-  - [State transitions](#state-transitions)
-- [StateMachine module](#statemachine-module)
-- [Motor example](#motor-example)
-  - [External events](#external-events)
-  - [State enumerations](#state-enumerations)
-  - [State functions](#state-functions)
-  - [State map](#state-map)
-  - [State machine objects](#state-machine-objects)
-  - [Transition map](#transition-map)
-  - [New state machine steps](#new-state-machine-steps)
-- [State engine](#state-engine)
-- [Generating events](#generating-events)
-- [No heap usage](#no-heap-usage)
-- [CentrifugeTest example](#centrifugetest-example)
-- [Multithread safety](#multithread-safety)
-- [Conclusion](#conclusion)
-- [References](#references)
+- [State Machine Design in C](https://github.com/endurodave/C_StateMachine#state-machine-design-in-c)
+- [Table of Contents](https://github.com/endurodave/C_StateMachine#table-of-contents)
+- [Preface](https://github.com/endurodave/C_StateMachine#preface)
+  - [Related repositories](https://github.com/endurodave/C_StateMachine#related-repositories)
+- [Getting Started](https://github.com/endurodave/C_StateMachine#getting-started)
+  - [PlatformIO](https://github.com/endurodave/C_StateMachine#platformio)
+- [Introduction](https://github.com/endurodave/C_StateMachine#introduction)
+  - [Background](https://github.com/endurodave/C_StateMachine#background)
+- [Why use a state machine?](https://github.com/endurodave/C_StateMachine#why-use-a-state-machine)
+- [State machine design](https://github.com/endurodave/C_StateMachine#state-machine-design)
+  - [Internal and external events](https://github.com/endurodave/C_StateMachine#internal-and-external-events)
+  - [Event data](https://github.com/endurodave/C_StateMachine#event-data)
+  - [State transitions](https://github.com/endurodave/C_StateMachine#state-transitions)
+- [StateMachine module](https://github.com/endurodave/C_StateMachine#statemachine-module)
+- [Motor example](https://github.com/endurodave/C_StateMachine#motor-example)
+  - [External events](https://github.com/endurodave/C_StateMachine#external-events)
+  - [State enumerations](https://github.com/endurodave/C_StateMachine#state-enumerations)
+  - [State functions](https://github.com/endurodave/C_StateMachine#state-functions)
+  - [State map](https://github.com/endurodave/C_StateMachine#state-map)
+  - [State machine objects](https://github.com/endurodave/C_StateMachine#state-machine-objects)
+  - [Transition map](https://github.com/endurodave/C_StateMachine#transition-map)
+  - [New state machine steps](https://github.com/endurodave/C_StateMachine#new-state-machine-steps)
+- [State engine](https://github.com/endurodave/C_StateMachine#state-engine)
+- [Generating events](https://github.com/endurodave/C_StateMachine#generating-events)
+- [No heap usage](https://github.com/endurodave/C_StateMachine#no-heap-usage)
+- [CentrifugeTest example](https://github.com/endurodave/C_StateMachine#centrifugetest-example)
+- [Multithread safety](https://github.com/endurodave/C_StateMachine#multithread-safety)
+- [Conclusion](https://github.com/endurodave/C_StateMachine#conclusion)
+- [References](https://github.com/endurodave/C_StateMachine#references)
 
 # Preface
 
@@ -63,7 +65,29 @@ Related repositories containing alternative state machine implementations.
    `cmake -B Build .`
 3. Build and run the project within the `Build` directory. 
 
-**PlatformIO:** add `lib_deps = C_StateMachine` to `platformio.ini`. The library builds the state machine, fixed-block allocator and lock files; the Motor and Centrifuge demos aren't included. The allocator lock uses `std::mutex`; define `SM_NO_LOCKS` (`build_flags = -DSM_NO_LOCKS`) for single-threaded use or a toolchain without `std::mutex`. It's defined automatically on AVR.
+The CMake build uses the copy of [C_Allocator](https://github.com/endurodave/C_Allocator) in the `allocator` folder for the fixed block allocator.
+
+## PlatformIO
+
+`C_StateMachine` is in the [PlatformIO registry](https://registry.platformio.org/libraries/endurodave/C_StateMachine). Add it to your project's `platformio.ini`:
+
+```ini
+lib_deps = endurodave/C_StateMachine@^1.2.0
+```
+
+PlatformIO installs [C_Allocator](https://github.com/endurodave/C_Allocator) with it; event data comes from C_Allocator's fixed block pools (see [No heap usage](https://github.com/endurodave/C_StateMachine#no-heap-usage)). `#include "StateMachine.h"`, and call `ALLOC_Init()` (from `"fb_allocator.h"`) once at startup, before the first event. The package contains the state machine and allocator glue only; the Motor and CentrifugeTest state machines in the repository root aren't included.
+
+The allocator locks with `std::mutex` where the toolchain has it (ESP32, desktop) and uses no lock on bare-metal STM32, RP2040 and AVR. On an RTOS, add C_Allocator's lock option for your OS, e.g. `build_flags = -DALLOC_LOCK_FREERTOS`; see C_Allocator's [Thread Safety](https://github.com/endurodave/C_Allocator#thread-safety). `-DSM_NO_LOCKS` still selects no lock.
+
+`FaultHandler()`, called when an `ASSERT` fails, comes from C_Allocator as a weak default that asserts and aborts. Define your own `FaultHandler(const char* file, unsigned short line)` to log or reset instead.
+
+The [c-statemachine-demo](https://github.com/endurodave/C_StateMachine/tree/master/examples/platformio/c-statemachine-demo) example runs the Motor state machine on ESP32, ESP32-C3, STM32 Nucleo-F401RE, STM32F4 Discovery, Raspberry Pi Pico, Arduino Mega 2560 and the desktop:
+
+```shell
+cd examples/platformio/c-statemachine-demo
+pio run -e esp32dev -t upload -t monitor
+pio run -e native -t exec
+```
 
 # Introduction
 
@@ -688,7 +712,7 @@ SM_InternalEvent(ST_CHANGE_SPEED, data);
 
 # No heap usage
 
-<p>All state machine event data must be dynamically created. However, on some systems using the heap is undesirable. The included <code>x_allocator</code> module is a fixed block memory allocator that eliminates heap usage. Define <code>USE_SM_ALLOCATOR </code>within <strong>StateMachine.c</strong> to use the fixed block allocator. See the <strong>References</strong> section below for&nbsp;<code>x_allocator</code> information.</p>
+<p>All state machine event data must be dynamically created. However, on some systems using the heap is undesirable. The <code>x_allocator</code> module from <a href="https://github.com/endurodave/C_Allocator">C_Allocator</a> is a fixed block memory allocator that eliminates heap usage. <code>USE_SM_ALLOCATOR</code>, defined in <strong>StateMachine.h</strong>, selects the fixed block allocator (<strong>sm_allocator.c</strong>: 10 blocks of 32 bytes and 5 of 128 bytes); remove it to use <code>malloc</code> and <code>free</code>. Call <code>ALLOC_Init()</code> once at startup. See the <strong>References</strong> section below for&nbsp;<code>x_allocator</code> information.</p>
 
 # CentrifugeTest example
 

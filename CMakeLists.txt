@@ -17,10 +17,16 @@ file(GLOB SOURCES
     "${CMAKE_SOURCE_DIR}/*.cpp"
     "${CMAKE_SOURCE_DIR}/*.c"
     "${CMAKE_SOURCE_DIR}/*.h"
+    # Copy of C_Allocator (https://github.com/endurodave/C_Allocator) for this
+    # build. The PlatformIO package depends on endurodave/C_Allocator instead.
+    "${CMAKE_SOURCE_DIR}/allocator/*.cpp"
+    "${CMAKE_SOURCE_DIR}/allocator/*.c"
+    "${CMAKE_SOURCE_DIR}/allocator/*.h"
 )
 
 # Add an executable target
 add_executable(C_StateMachineApp ${SOURCES})
+target_include_directories(C_StateMachineApp PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/allocator)
 
 
 

@@ -1,6 +1,5 @@
 #include "x_allocator.h"
 #include "fb_allocator.h"
-#include "DataTypes.h"
 #include "Fault.h"
 #include <string.h>
 
@@ -69,7 +68,7 @@ static void* XALLOC_GetBlockPtr(void* block)
 //----------------------------------------------------------------------------
 static ALLOC_Allocator* XALLOC_GetAllocator(XAllocData* self, size_t size)
 {
-    UINT16 i = 0;
+    uint16_t i = 0;
     ALLOC_Allocator* pAllocator = NULL;
 
     ASSERT_TRUE(self);

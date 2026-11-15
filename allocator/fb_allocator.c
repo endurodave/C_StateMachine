@@ -1,9 +1,13 @@
 #include "fb_allocator.h"
-#include "DataTypes.h"
 #include "Fault.h"
 #include <string.h>
 
-// Default lock is std::mutex; define SM_NO_LOCKS for none (see LockGuard.h)
+// @see https://github.com/endurodave/C_Allocator
+// David Lafreniere
+
+// Lock options (std::mutex, FreeRTOS, ThreadX, Zephyr, CMSIS-RTOS2, none) are
+// selected at compile time; see LockGuard.h. One lock guards every allocator's
+// free-list and statistics.
 #include "LockGuard.h"
 static LOCK_HANDLE _hLock;
 
@@ -21,61 +25,45 @@ static void* ALLOC_Pop(ALLOC_Allocator* alloc);
 
 //----------------------------------------------------------------------------
 // ALLOC_NewBlock
+// Get an unused block from the pool, or NULL. Caller holds the lock.
 //----------------------------------------------------------------------------
 static void* ALLOC_NewBlock(ALLOC_Allocator* self)
 {
     ALLOC_Block* pBlock = NULL;
 
-    LK_LOCK(_hLock);
-
     // If we have not exceeded the pool maximum
     if (self->poolIndex < self->maxBlocks)
     {
         // Get pointer to a new fixed memory block within the pool
-        pBlock = (void*)(self->pPool + (self->poolIndex++ * self->blockSize));
-    }
-
-    LK_UNLOCK(_hLock);
-
-    if (!pBlock)
-    {
-        // Out of fixed block memory
-        ASSERT();
+        pBlock = (ALLOC_Block*)(self->pPool + (self->poolIndex++ * self->blockSize));
     }
 
     return pBlock;
-} 
+}
 
 //----------------------------------------------------------------------------
 // ALLOC_Push
+// Push a block onto the free-list. Caller holds the lock.
 //----------------------------------------------------------------------------
 static void ALLOC_Push(ALLOC_Allocator* self, void* pBlock)
 {
-    if (!pBlock)
-        return;
-
     // Get a pointer to the client's location within the block
     ALLOC_Block* pClient = (ALLOC_Block*)GET_CLIENT_PTR(pBlock);
-
-    LK_LOCK(_hLock);
 
     // Point client block's next pointer to head
     pClient->pNext = self->pHead;
 
     // The client block is now the new head
     self->pHead = pClient;
-
-    LK_UNLOCK(_hLock); 
 }
 
 //----------------------------------------------------------------------------
 // ALLOC_Pop
+// Pop a block from the free-list, or NULL if empty. Caller holds the lock.
 //----------------------------------------------------------------------------
 static void* ALLOC_Pop(ALLOC_Allocator* self)
 {
     ALLOC_Block* pBlock = NULL;
-
-    LK_LOCK(_hLock);
 
     // Is the free-list empty?
     if (self->pHead)
@@ -84,12 +72,11 @@ static void* ALLOC_Pop(ALLOC_Allocator* self)
         pBlock = self->pHead;
 
         // Set the head to the next block
-        self->pHead = self->pHead->pNext;
+        self->pHead = (ALLOC_Block*)self->pHead->pNext;
     }
 
-    LK_UNLOCK(_hLock); 
     return GET_BLOCK_PTR(pBlock);
-} 
+}
 
 //----------------------------------------------------------------------------
 // ALLOC_Init
@@ -97,7 +84,7 @@ static void* ALLOC_Pop(ALLOC_Allocator* self)
 void ALLOC_Init()
 {
     _hLock = LK_CREATE();
-} 
+}
 
 //----------------------------------------------------------------------------
 // ALLOC_Term
@@ -105,6 +92,7 @@ void ALLOC_Init()
 void ALLOC_Term()
 {
     LK_DESTROY(_hLock);
+    _hLock = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -114,24 +102,22 @@ void* ALLOC_Alloc(ALLOC_HANDLE hAlloc, size_t size)
 {
     ALLOC_Allocator* self = NULL;
     void* pBlock = NULL;
+    LOCK_STATE lock;
 
     ASSERT_TRUE(hAlloc);
 
     // Convert handle to an ALLOC_Allocator instance
     self = (ALLOC_Allocator*)hAlloc;
 
-    // Ensure requested size fits within memory block 
+    // Ensure requested size fits within memory block
     ASSERT_TRUE(size <= self->blockSize);
 
-    // Get a block from the free-list
-    pBlock = ALLOC_Pop(self);
+    lock = LK_LOCK(_hLock);
 
-    // If the free-list empty?
+    // Get a block from the free-list, or a new one from the pool
+    pBlock = ALLOC_Pop(self);
     if (!pBlock)
-    {
-        // Get a new block from the pool
         pBlock = ALLOC_NewBlock(self);
-    }
 
     if (pBlock)
     {
@@ -144,8 +130,16 @@ void* ALLOC_Alloc(ALLOC_HANDLE hAlloc, size_t size)
         }
     }
 
+    LK_UNLOCK(_hLock, lock);
+
+    if (!pBlock)
+    {
+        // Out of fixed block memory
+        ASSERT();
+    }
+
     return GET_CLIENT_PTR(pBlock);
-} 
+}
 
 //----------------------------------------------------------------------------
 // ALLOC_Calloc
@@ -165,7 +159,7 @@ void* ALLOC_Calloc(ALLOC_HANDLE hAlloc, size_t num, size_t size)
 
     if (pMem != NULL)
     {
-        // Initialize memory to 0 per calloc behavior 
+        // Initialize memory to 0 per calloc behavior
         memset(pMem, 0, n);
     }
 
@@ -178,6 +172,7 @@ void* ALLOC_Calloc(ALLOC_HANDLE hAlloc, size_t num, size_t size)
 void ALLOC_Free(ALLOC_HANDLE hAlloc, void* pBlock)
 {
     ALLOC_Allocator* self = NULL;
+    LOCK_STATE lock;
 
     if (!pBlock)
         return;
@@ -190,13 +185,14 @@ void ALLOC_Free(ALLOC_HANDLE hAlloc, void* pBlock)
     // Get a pointer to the block
     pBlock = GET_BLOCK_PTR(pBlock);
 
+    lock = LK_LOCK(_hLock);
+
     // Push the block onto a stack (i.e. the free-list)
     ALLOC_Push(self, pBlock);
 
     // Keep track of usage statistics
     self->deallocations++;
     self->blocksInUse--;
-} 
 
-
-
+    LK_UNLOCK(_hLock, lock);
+}

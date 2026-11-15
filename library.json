@@ -1,7 +1,7 @@
 {
   "name": "C_StateMachine",
-  "version": "1.1.0",
-  "description": "Compact C finite state machine for embedded systems. Table-driven, guard/entry/exit actions, typed event data, optional fixed-block allocator (no heap).",
+  "version": "1.2.0",
+  "description": "Compact C finite state machine for embedded systems. Table-driven, guard/entry/exit actions, typed event data allocated from C_Allocator fixed block pools (no heap).",
   "keywords": ["state machine", "fsm", "embedded", "c", "fixed block allocator", "event driven"],
   "repository": { "type": "git", "url": "https://github.com/endurodave/C_StateMachine.git" },
   "authors": [{ "name": "David Lafreniere", "url": "https://github.com/endurodave", "maintainer": true }],
@@ -10,12 +10,29 @@
   "frameworks": "*",
   "platforms": "*",
   "headers": "StateMachine.h",
+  "dependencies": [
+    { "owner": "endurodave", "name": "C_Allocator", "version": "^2.0.0" }
+  ],
   "export": {
-    "include": ["StateMachine.c", "StateMachine.h", "sm_allocator.c", "sm_allocator.h", "x_allocator.c", "x_allocator.h", "fb_allocator.c", "fb_allocator.h", "LockGuard.cpp", "LockGuard.h", "Fault.cpp", "Fault.h", "DataTypes.h", "LICENSE", "README.md", "library.json"]
+    "include": [
+      "StateMachine.c", "StateMachine.h", "sm_allocator.c", "sm_allocator.h",
+      "Fault.h", "DataTypes.h", "LICENSE", "README.md", "library.json",
+      "examples/platformio/c-statemachine-demo/platformio.ini",
+      "examples/platformio/c-statemachine-demo/src/main.cpp",
+      "examples/platformio/c-statemachine-demo/src/Motor.c",
+      "examples/platformio/c-statemachine-demo/src/Motor.h"
+    ]
   },
   "build": {
     "srcDir": ".",
     "includeDir": ".",
-    "srcFilter": ["-<*>", "+<StateMachine.c>", "+<sm_allocator.c>", "+<x_allocator.c>", "+<fb_allocator.c>", "+<LockGuard.cpp>", "+<Fault.cpp>"]
-  }
+    "srcFilter": ["-<*>", "+<StateMachine.c>", "+<sm_allocator.c>"]
+  },
+  "examples": [
+    {
+      "name": "c-statemachine-demo",
+      "base": "examples/platformio/c-statemachine-demo",
+      "files": ["platformio.ini", "src/main.cpp", "src/Motor.c", "src/Motor.h"]
+    }
+  ]
 }

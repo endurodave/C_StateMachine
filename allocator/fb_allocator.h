@@ -1,4 +1,5 @@
-// https://github.com/endurodave/C_Allocator
+// @see https://github.com/endurodave/C_Allocator
+// David Lafreniere
 //
 // The fb_allocator is a fixed block memory allocator that handles a 
 // single block size. 
@@ -22,7 +23,7 @@
 #define _FB_ALLOCATOR_H
 
 #include <stdlib.h>
-#include "DataTypes.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,18 +43,31 @@ typedef struct
     const char* pPool;
     const size_t objectSize;
     const size_t blockSize;
-    const UINT32 maxBlocks;
+    const uint32_t maxBlocks;
     ALLOC_Block* pHead;
-    UINT16 poolIndex;
-    UINT16 blocksInUse;
-    UINT16 maxBlocksInUse;
-    UINT16 allocations;
-    UINT16 deallocations;
+    uint16_t poolIndex;
+    uint16_t blocksInUse;
+    uint16_t maxBlocksInUse;
+    uint16_t allocations;
+    uint16_t deallocations;
 } ALLOC_Allocator;
 
-// Align fixed blocks on X-byte boundary based on CPU architecture.
-// Set value to 1, 2, 4 or 8.
-#define ALLOC_MEM_ALIGN   (1)
+// Align fixed blocks on X-byte boundary based on CPU architecture: 1, 2, 4
+// or 8. The default, pointer size, keeps every block aligned for pointers
+// and 32-bit words; some CPUs (e.g. Cortex-M0) fault on an unaligned access.
+// Define ALLOC_MEM_ALIGN (e.g. -DALLOC_MEM_ALIGN=8) to change it.
+#ifndef ALLOC_MEM_ALIGN
+#define ALLOC_MEM_ALIGN   (sizeof(void*))
+#endif
+
+// Pool storage element, so a pool starts at an address aligned for any of
+// these types
+typedef union
+{
+    void* p;
+    long long ll;
+    double d;
+} ALLOC_PoolAlign;
 
 // Get the maximum between a or b
 #define ALLOC_MAX(a,b) (((a)>(b))?(a):(b))
@@ -74,8 +88,9 @@ typedef struct
 // _objects_ - number of fixed memory blocks 
 // e.g. ALLOC_DEFINE(myAllocator, 32, 10)
 #define ALLOC_DEFINE(_name_, _size_, _objects_) \
-    static char _name_##Memory[ALLOC_BLOCK_SIZE(_size_) * (_objects_)] = { 0 }; \
-    static ALLOC_Allocator _name_##Obj = { #_name_, _name_##Memory, _size_, \
+    static ALLOC_PoolAlign _name_##Memory[(ALLOC_BLOCK_SIZE(_size_) * (_objects_) + \
+        sizeof(ALLOC_PoolAlign) - 1) / sizeof(ALLOC_PoolAlign)]; \
+    static ALLOC_Allocator _name_##Obj = { #_name_, (const char*)_name_##Memory, _size_, \
         ALLOC_BLOCK_SIZE(_size_), _objects_, NULL, 0, 0, 0, 0, 0 }; \
     static ALLOC_HANDLE _name_ = &_name_##Obj;
 

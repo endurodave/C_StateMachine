@@ -1,4 +1,5 @@
 // @see https://github.com/endurodave/C_Allocator
+// David Lafreniere
 //
 // The x_allocator is a fixed block memory allocator that handles multiple 
 // block sizes by using two or more fb_allocator objects. Typically users 
@@ -63,7 +64,7 @@ typedef struct
     ALLOC_Allocator* const *allocators;
 
     // Number of allocator instances stored within the allocators array
-    const UINT16 maxAllocators;
+    const uint16_t maxAllocators;
 } XAllocData;
 
 void* XALLOC_Alloc(XAllocData* self, size_t size);
