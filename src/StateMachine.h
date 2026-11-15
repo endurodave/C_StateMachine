@@ -22,6 +22,14 @@
 extern "C" {
 #endif
 
+// State, guard, entry and exit functions need not use their self or event data
+// arguments: no unused-parameter warning for them
+#if defined(__GNUC__) || defined(__clang__)
+#define SM_UNUSED __attribute__((unused))
+#else
+#define SM_UNUSED
+#endif
+
 // Define USE_SM_ALLOCATOR to use the fixed block allocator instead of heap
 #define USE_SM_ALLOCATOR
 #ifdef USE_SM_ALLOCATOR
@@ -118,25 +126,25 @@ void _SM_StateEngineEx(SM_StateMachine* self, const SM_StateMachineConst* selfCo
     static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
 #define STATE_DEFINE(_stateFunc_, _eventData_) \
-    static void ST_##_stateFunc_(SM_StateMachine* self, _eventData_* pEventData)
+    static void ST_##_stateFunc_(SM_StateMachine* self SM_UNUSED, _eventData_* pEventData SM_UNUSED)
 
 #define GUARD_DECLARE(_guardFunc_, _eventData_) \
     static BOOL GD_##_guardFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
 #define GUARD_DEFINE(_guardFunc_, _eventData_) \
-    static BOOL GD_##_guardFunc_(SM_StateMachine* self, _eventData_* pEventData)
+    static BOOL GD_##_guardFunc_(SM_StateMachine* self SM_UNUSED, _eventData_* pEventData SM_UNUSED)
 
 #define ENTRY_DECLARE(_entryFunc_, _eventData_) \
     static void EN_##_entryFunc_(SM_StateMachine* self, _eventData_* pEventData);
 
 #define ENTRY_DEFINE(_entryFunc_, _eventData_) \
-    static void EN_##_entryFunc_(SM_StateMachine* self, _eventData_* pEventData)
+    static void EN_##_entryFunc_(SM_StateMachine* self SM_UNUSED, _eventData_* pEventData SM_UNUSED)
 
 #define EXIT_DECLARE(_exitFunc_) \
     static void EX_##_exitFunc_(SM_StateMachine* self);
 
 #define EXIT_DEFINE(_exitFunc_) \
-    static void EX_##_exitFunc_(SM_StateMachine* self)
+    static void EX_##_exitFunc_(SM_StateMachine* self SM_UNUSED)
 
 #define BEGIN_STATE_MAP(_smName_) \
     static const SM_StateStruct _smName_##StateMap[] = { 

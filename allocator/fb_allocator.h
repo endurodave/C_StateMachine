@@ -81,6 +81,14 @@ typedef union
 #define ALLOC_BLOCK_SIZE(_size_) \
     (ALLOC_MAX((ALLOC_ROUND_UP(_size_, ALLOC_MEM_ALIGN)), sizeof(ALLOC_Allocator*)))
 
+// The handle ALLOC_DEFINE makes goes unused when only the ALLOC_Allocator object
+// is needed (e.g. for x_allocator): no unused-variable warning for it
+#if defined(__GNUC__) || defined(__clang__)
+#define ALLOC_MAYBE_UNUSED __attribute__((unused))
+#else
+#define ALLOC_MAYBE_UNUSED
+#endif
+
 // Defines block memory, allocator instance and a handle. On the example below, 
 // the ALLOC_Allocator instance is myAllocatorObj and the handle is myAllocator.
 // _name_ - the allocator name
@@ -92,7 +100,7 @@ typedef union
         sizeof(ALLOC_PoolAlign) - 1) / sizeof(ALLOC_PoolAlign)]; \
     static ALLOC_Allocator _name_##Obj = { #_name_, (const char*)_name_##Memory, _size_, \
         ALLOC_BLOCK_SIZE(_size_), _objects_, NULL, 0, 0, 0, 0, 0 }; \
-    static ALLOC_HANDLE _name_ = &_name_##Obj;
+    static ALLOC_HANDLE _name_ ALLOC_MAYBE_UNUSED = &_name_##Obj;
 
 void ALLOC_Init(void);
 void ALLOC_Term(void);

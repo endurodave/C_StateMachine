@@ -1,0 +1,68 @@
+name: Arduino
+
+# Checks the library the way the Arduino Library Manager does (arduino-lint;
+# until C_Allocator is in the Library Manager index it warns about depends=)
+# and compiles the examples/ sketches with the Arduino toolchain, as the
+# Arduino IDE would after installing the library.
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+# Least privilege for GITHUB_TOKEN: these jobs only check out code.
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Arduino Lint
+      uses: arduino/arduino-lint-action@v2
+      with:
+        library-manager: submit
+        compliance: strict
+
+  compile:
+    name: compile ${{ matrix.fqbn }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fqbn: arduino:avr:mega
+            platforms: |
+              - name: arduino:avr
+          - fqbn: arduino:sam:arduino_due_x
+            platforms: |
+              - name: arduino:sam
+          - fqbn: esp32:esp32:esp32
+            platforms: |
+              - name: esp32:esp32
+                source-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Compile examples
+      uses: arduino/compile-sketches@v1
+      with:
+        fqbn: ${{ matrix.fqbn }}
+        platforms: ${{ matrix.platforms }}
+        # C_Allocator is a dependency (library.properties depends=); from its
+        # release tag until it is in the Library Manager index
+        libraries: |
+          - source-path: ./
+          - source-url: https://github.com/endurodave/C_Allocator.git
+            version: v2.1.0
+        sketch-paths: |
+          - examples/C_StateMachine_Demo
+        enable-warnings-report: true
