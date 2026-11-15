@@ -1,0 +1,59 @@
+name: PlatformIO
+
+# Builds examples/platformio/c-statemachine-demo for every board in its
+# platformio.ini, and runs the native build on the desktop. The example's
+# lib_deps points at this checkout, so each push tests the library as
+# PlatformIO users consume it (library.json, srcFilter).
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+# Least privilege for GITHUB_TOKEN: these jobs only check out code.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.env }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [esp32dev, esp32-c3, nucleo_f401re, disco_f407vg, pico, megaatmega2560, native]
+
+    defaults:
+      run:
+        working-directory: examples/platformio/c-statemachine-demo
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Cache PlatformIO
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.platformio
+        key: pio-${{ matrix.env }}-${{ hashFiles('examples/platformio/c-statemachine-demo/platformio.ini') }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install PlatformIO
+      run: pip install --upgrade platformio
+
+    - name: Build
+      run: pio run -e ${{ matrix.env }}
+
+    - name: Run (native)
+      if: matrix.env == 'native'
+      run: pio run -e native -t exec

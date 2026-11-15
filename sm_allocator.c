@@ -31,6 +31,9 @@ static XAllocData self = { allocators, MAX_ALLOCATORS };
 //----------------------------------------------------------------------------
 void* SMALLOC_Alloc(size_t size)
 {
+    // x_allocator uses the pool objects, not the handles ALLOC_DEFINE also makes
+    (void)smDataAllocator32;
+    (void)smDataAllocator128;
     return XALLOC_Alloc(&self, size);
 }
 
